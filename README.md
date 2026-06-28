@@ -100,6 +100,54 @@ Run the MCP stdio server (one tool, `reconcile`, params `{ testimony, trace }`):
 npm run mcp        # or: node dist/mcp.js
 ```
 
+## Deploy as an HTTP endpoint (Vercel / Netlify)
+
+The core is a pure, stateless, network-free function, so it drops straight into a
+serverless function. This repo ships both, plus a one-page paste-and-diff UI
+(`public/index.html`). Both expose the same route, `POST /api/reconcile` with a
+JSON body `{ testimony, trace }`.
+
+```bash
+curl -X POST https://<your-deployment>/api/reconcile \
+  -H 'content-type: application/json' \
+  -d '{"testimony":"## What I did not do\n- Left `app.py` untouched.\n","trace":"{\"id\":\"e1\",\"actor\":\"agent\",\"kind\":\"file_write\",\"summary\":\"edit\",\"target\":\"app.py\"}"}'
+```
+
+- **Vercel** — zero config beyond what's here. `vercel deploy` (or connect the
+  repo). `vercel.json` runs `npm run build` and serves `public/` + `api/`.
+- **Netlify** — `netlify deploy` (or connect the repo). `netlify.toml` builds,
+  publishes `public/`, and redirects `/api/reconcile` to the function so the UI
+  works unchanged on both.
+
+The CLI and the **stdio** MCP server are not web services — run those locally (or
+publish to npm and `npx` the CLI). A remote MCP would need the Streamable-HTTP
+transport instead of stdio.
+
+## Publish to npm
+
+The package name in `package.json` (`@local/aar-reconcile`) is a placeholder —
+`@local` is not a publishable scope. First pick a real name:
+
+```bash
+# pick ONE and set it as "name" in package.json:
+#   unscoped:  aar-reconcile           (check it's free: npm view aar-reconcile)
+#   scoped:    @yourname/aar-reconcile (publishConfig.access is already "public")
+npm login
+npm publish        # runs prepublishOnly: clean -> build -> test, then ships dist/
+npm view <name>    # verify
+```
+
+Cutting later releases:
+
+```bash
+npm version patch   # or minor / major — bumps package.json and tags vX.Y.Z
+git push --follow-tags
+npm publish
+```
+
+After publishing, users get the CLI with `npm i -g <name>` (`oi reconcile …`) or
+`npx <name> reconcile …`, and the library/MCP via `import` / `node dist/mcp.js`.
+
 ## Develop
 
 ```bash
