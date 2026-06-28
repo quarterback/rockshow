@@ -1,0 +1,39 @@
+{
+  "status": "partial",
+  "summary": "partial: 2 claimed action(s) verified, 1 unsupported, 0 omitted, 0 contradicted, 0 evidence gap(s).",
+  "claimed_actions": [
+    {
+      "claim": "Fix the nearly-invisible table body text in dark mode",
+      "matched_events": [
+        "ev-1"
+      ],
+      "confidence": "low"
+    },
+    {
+      "claim": "Edited `o27v2/web/static/app.css` to set an explicit body text color on tables",
+      "matched_events": [
+        "ev-2"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "omitted_actions": [],
+  "unsupported_claims": [
+    {
+      "claim": "Ran the full suite with `pytest`",
+      "reason": "claimed command `pytest`; no command/test event matches it"
+    }
+  ],
+  "contradicted_claims": [],
+  "evidence_gaps": [],
+  "review": {
+    "needs_human_review": true,
+    "reasons": [
+      "1 claim(s) have no trace evidence"
+    ],
+    "recommended_next_questions": [
+      "The AAR claims \"Ran the full suite with `pytest`\" but the trace has no matching evidence — did this actually happen?"
+    ]
+  },
+  "run_id": "run-unsup"
+}
