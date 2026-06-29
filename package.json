@@ -1,13 +1,16 @@
 {
   "name": "closedtab",
-  "version": "0.1.0",
-  "description": "closedtab — Agent AAR Reconciliation Tool. Reconcile an After-Action Report (testimony) against a machine trace of what an agent actually did.",
+  "version": "0.2.0",
+  "description": "Write After-Action Reports (AARs) the easy way — guided, structured, two minutes. Plus an optional reconcile step that checks an AAR against a trace of what actually happened.",
   "type": "module",
   "license": "MIT",
   "keywords": [
     "closedtab",
     "aar",
     "after-action-report",
+    "documentation",
+    "changelog",
+    "scaffold",
     "agent",
     "reconciliation",
     "trace",

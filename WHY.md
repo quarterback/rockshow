@@ -1,6 +1,20 @@
 # WHY
 
-## The problem
+## Start with the habit, not the audit
+
+`closedtab` is two things, in order of importance. First and foremost it helps you
+**write** After-Action Reports — because almost nobody does, and the practice is
+worth more than any tool built on top of it. An AAR is a two-minute note at the
+end of a task: what was asked, what you did, what you deliberately didn't. Writing
+them is the whole point; the structure and the guided prompts exist to lower the
+friction until it's a habit.
+
+The second thing — reconciliation — only makes sense once the first exists. It
+presupposes you *have* AARs to check. If nobody writes them, an audit tool has no
+input. So authoring is the front door, and the rest of this document is about the
+audit layer you grow into later.
+
+## The problem (the audit layer)
 
 We delegate work to agents and then read their account of it. The account — the
 After-Action Report — is written by the same actor whose work it describes. When

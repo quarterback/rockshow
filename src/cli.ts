@@ -1,21 +1,24 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync } from "node:fs";
 import { reconcileText } from "./index.js";
+import { runNew } from "./newCommand.js";
+import { GUIDE } from "./guide.js";
 
-// Thin CLI over the reconcile() core.
+// Thin CLI over the closedtab core. Three commands:
 //
-//   closedtab reconcile --testimony ./testimony.md --trace ./trace.jsonl --out ./diff.json
+//   closedtab new [title] [--type bugfix|feature|investigation|generic]
+//   closedtab guide
+//   closedtab reconcile --testimony <file.md> --trace <file.jsonl|json> [--out <diff.json>]
 //
-// --trace accepts a .jsonl (one event per line) or .json (array); the format is
-// auto-detected by the parser. With no --out the diff is pretty-printed to
-// stdout. Exit code is 0 on a successful run — a contradiction is a finding in
-// the diff, not a CLI error.
+// Authoring (`new`) is the front door — write AARs the way you'd want to read
+// them. `reconcile` is the advanced step: once you have an AAR and a record of
+// what actually happened, check one against the other.
 
-type Args = { [k: string]: string | boolean };
+type Args = { [k: string]: string | boolean | string[]; _: string[] };
 
 function parseArgs(argv: string[]): { command: string; args: Args } {
   const command = argv[0] ?? "";
-  const args: Args = {};
+  const args: Args = { _: [] };
   for (let i = 1; i < argv.length; i++) {
     const a = argv[i];
     if (a.startsWith("--")) {
@@ -27,44 +30,34 @@ function parseArgs(argv: string[]): { command: string; args: Args } {
       } else {
         args[key] = true;
       }
+    } else {
+      args._.push(a);
     }
   }
   return { command, args };
 }
 
-const USAGE = `closedtab — Agent AAR Reconciliation Tool  (alias: oi)
+const USAGE = `closedtab — write After-Action Reports (and, later, check them)  (alias: oi)
 
 Usage:
+  closedtab new [title] [--type bugfix|feature|investigation|generic] [--dir docs]
+      Walk through a new AAR question by question and write a dated aar-<slug>.md.
+
+  closedtab guide
+      Print a short how-to on writing AARs and why they're worth the two minutes.
+
   closedtab reconcile --testimony <file.md> --trace <file.jsonl|file.json> [--out <diff.json>]
+      Check an AAR (testimony) against a machine trace of what actually happened.
 
-Options:
-  --testimony  Path to the AAR markdown (the testimony).
-  --trace      Path to the trace (.jsonl one-object-per-line, or .json array).
-  --out        Write the diff JSON here. Omit to pretty-print to stdout.
-  -h, --help   Show this help.
+  -h, --help    Show this help.`;
 
-Exit code is 0 on a successful run; a contradiction is reported in the diff,
-not as a CLI error.`;
-
-function main(): void {
-  const { command, args } = parseArgs(process.argv.slice(2));
-
-  if (command === "" || args.help || args.h || command === "help") {
-    console.log(USAGE);
-    process.exit(command === "" ? 1 : 0);
-  }
-
-  if (command !== "reconcile") {
-    console.error(`closedtab: unknown command "${command}"\n\n${USAGE}`);
-    process.exit(2);
-  }
-
+function reconcileCommand(args: Args): number {
   const testimonyPath = args.testimony;
   const tracePath = args.trace;
   if (typeof testimonyPath !== "string" || typeof tracePath !== "string") {
     console.error("closedtab reconcile: --testimony and --trace are both required.\n");
     console.error(USAGE);
-    process.exit(2);
+    return 2;
   }
 
   let testimony: string;
@@ -73,15 +66,13 @@ function main(): void {
     testimony = readFileSync(testimonyPath, "utf8");
   } catch (e) {
     console.error(`closedtab: cannot read testimony "${testimonyPath}": ${(e as Error).message}`);
-    process.exit(2);
-    return;
+    return 2;
   }
   try {
     trace = readFileSync(tracePath, "utf8");
   } catch (e) {
     console.error(`closedtab: cannot read trace "${tracePath}": ${(e as Error).message}`);
-    process.exit(2);
-    return;
+    return 2;
   }
 
   let diff;
@@ -89,8 +80,7 @@ function main(): void {
     diff = reconcileText(testimony, trace);
   } catch (e) {
     console.error(`closedtab: reconcile failed: ${(e as Error).message}`);
-    process.exit(2);
-    return;
+    return 2;
   }
 
   const json = JSON.stringify(diff, null, 2);
@@ -100,7 +90,42 @@ function main(): void {
   } else {
     console.log(json);
   }
-  process.exit(0);
+  return 0;
 }
 
-main();
+async function main(): Promise<number> {
+  const { command, args } = parseArgs(process.argv.slice(2));
+
+  if (command === "" || args.help || args.h || command === "help") {
+    console.log(USAGE);
+    return command === "" ? 1 : 0;
+  }
+
+  switch (command) {
+    case "new": {
+      const title = typeof args.title === "string" ? args.title : args._[0];
+      await runNew({
+        type: typeof args.type === "string" ? args.type : undefined,
+        title: typeof title === "string" ? title : undefined,
+        dir: typeof args.dir === "string" ? args.dir : undefined,
+      });
+      return 0;
+    }
+    case "guide":
+      console.log(GUIDE);
+      return 0;
+    case "reconcile":
+      return reconcileCommand(args);
+    default:
+      console.error(`closedtab: unknown command "${command}"\n\n${USAGE}`);
+      return 2;
+  }
+}
+
+main().then(
+  (code) => process.exit(code),
+  (e) => {
+    console.error(`closedtab: ${(e as Error).message}`);
+    process.exit(1);
+  },
+);
