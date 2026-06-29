@@ -4,7 +4,7 @@ import { reconcileText } from "./index.js";
 
 // Thin CLI over the reconcile() core.
 //
-//   tabbycat reconcile --testimony ./testimony.md --trace ./trace.jsonl --out ./diff.json
+//   closedtab reconcile --testimony ./testimony.md --trace ./trace.jsonl --out ./diff.json
 //
 // --trace accepts a .jsonl (one event per line) or .json (array); the format is
 // auto-detected by the parser. With no --out the diff is pretty-printed to
@@ -32,10 +32,10 @@ function parseArgs(argv: string[]): { command: string; args: Args } {
   return { command, args };
 }
 
-const USAGE = `tabbycat — Agent AAR Reconciliation Tool  (alias: oi)
+const USAGE = `closedtab — Agent AAR Reconciliation Tool  (alias: oi)
 
 Usage:
-  tabbycat reconcile --testimony <file.md> --trace <file.jsonl|file.json> [--out <diff.json>]
+  closedtab reconcile --testimony <file.md> --trace <file.jsonl|file.json> [--out <diff.json>]
 
 Options:
   --testimony  Path to the AAR markdown (the testimony).
@@ -55,14 +55,14 @@ function main(): void {
   }
 
   if (command !== "reconcile") {
-    console.error(`tabbycat: unknown command "${command}"\n\n${USAGE}`);
+    console.error(`closedtab: unknown command "${command}"\n\n${USAGE}`);
     process.exit(2);
   }
 
   const testimonyPath = args.testimony;
   const tracePath = args.trace;
   if (typeof testimonyPath !== "string" || typeof tracePath !== "string") {
-    console.error("tabbycat reconcile: --testimony and --trace are both required.\n");
+    console.error("closedtab reconcile: --testimony and --trace are both required.\n");
     console.error(USAGE);
     process.exit(2);
   }
@@ -72,14 +72,14 @@ function main(): void {
   try {
     testimony = readFileSync(testimonyPath, "utf8");
   } catch (e) {
-    console.error(`tabbycat: cannot read testimony "${testimonyPath}": ${(e as Error).message}`);
+    console.error(`closedtab: cannot read testimony "${testimonyPath}": ${(e as Error).message}`);
     process.exit(2);
     return;
   }
   try {
     trace = readFileSync(tracePath, "utf8");
   } catch (e) {
-    console.error(`tabbycat: cannot read trace "${tracePath}": ${(e as Error).message}`);
+    console.error(`closedtab: cannot read trace "${tracePath}": ${(e as Error).message}`);
     process.exit(2);
     return;
   }
@@ -88,7 +88,7 @@ function main(): void {
   try {
     diff = reconcileText(testimony, trace);
   } catch (e) {
-    console.error(`tabbycat: reconcile failed: ${(e as Error).message}`);
+    console.error(`closedtab: reconcile failed: ${(e as Error).message}`);
     process.exit(2);
     return;
   }
@@ -96,7 +96,7 @@ function main(): void {
   const json = JSON.stringify(diff, null, 2);
   if (typeof args.out === "string") {
     writeFileSync(args.out, json + "\n", "utf8");
-    console.error(`tabbycat: ${diff.status} — wrote ${args.out}`);
+    console.error(`closedtab: ${diff.status} — wrote ${args.out}`);
   } else {
     console.log(json);
   }

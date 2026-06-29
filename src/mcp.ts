@@ -9,7 +9,7 @@ import { reconcileText } from "./index.js";
 // one call — the headline surface for the agent/MCP crowd.
 
 const server = new McpServer({
-  name: "tabbycat",
+  name: "closedtab",
   version: "0.1.0",
 });
 
@@ -45,10 +45,10 @@ async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   // stderr so it never pollutes the stdio JSON-RPC channel.
-  console.error("tabbycat MCP server running on stdio");
+  console.error("closedtab MCP server running on stdio");
 }
 
 main().catch((e) => {
-  console.error("tabbycat MCP server failed to start:", e);
+  console.error("closedtab MCP server failed to start:", e);
   process.exit(1);
 });

@@ -1,15 +1,15 @@
-# tabbycat — Agent AAR Reconciliation Tool
+# closedtab — Agent AAR Reconciliation Tool
 
 Reconcile what an agent **said it did** (an After-Action Report) against what the
 trace shows it **actually did**.
 
 ```bash
-npm install -g @quarterback/tabbycat
+npm install -g closedtab
 ```
 
 ```bash
-tabbycat reconcile --testimony ./testimony.md --trace ./trace.jsonl --out ./diff.json
-# `oi` is a short alias for `tabbycat`
+closedtab reconcile --testimony ./testimony.md --trace ./trace.jsonl --out ./diff.json
+# `oi` is a short alias for `closedtab`
 ```
 
 The AAR says it left a file untouched; the trace shows a write to it. The diff
@@ -90,7 +90,7 @@ The CLI is a thin wrapper over a pure core; the MCP server is a second surface
 over the identical `reconcile()`.
 
 ```ts
-import { reconcileText, reconcile, parseAarTestimony, parseTrace } from "@quarterback/tabbycat";
+import { reconcileText, reconcile, parseAarTestimony, parseTrace } from "closedtab";
 
 const diff = reconcileText(testimonyMarkdown, traceJsonlText);
 ```
@@ -126,13 +126,12 @@ transport instead of stdio.
 
 ## Publish to npm
 
-Published as **`@quarterback/tabbycat`** (the bare `tabbycat` name was taken;
-this uses the project's own scope). `publishConfig.access` is already `public`.
+Published as **`closedtab`** (unscoped — `npm i closedtab`).
 
 ```bash
 npm login
 npm publish        # runs prepublishOnly: clean -> build -> test, then ships dist/
-npm view @quarterback/tabbycat   # verify
+npm view closedtab   # verify
 ```
 
 Cutting later releases:
@@ -143,8 +142,8 @@ git push --follow-tags
 npm publish
 ```
 
-After publishing, users get the CLI with `npm i -g @quarterback/tabbycat`
-(`tabbycat reconcile …`, or the `oi` alias) or `npx @quarterback/tabbycat
+After publishing, users get the CLI with `npm i -g closedtab`
+(`closedtab reconcile …`, or the `oi` alias) or `npx closedtab
 reconcile …`, and the library/MCP via `import` / `node dist/mcp.js`.
 
 ## Develop
