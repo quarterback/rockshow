@@ -8,6 +8,13 @@ export { reconcile, matchLevel } from "./reconcile.js";
 export { extractEntities } from "./entities.js";
 export { classifyHeading } from "./anchors.js";
 
+// AAR authoring
+export { TEMPLATES, getTemplate } from "./templates.js";
+export type { Template, SectionSpec } from "./templates.js";
+export { renderAar, slugify, aarFilename } from "./renderAar.js";
+export type { AarMeta, Answers } from "./renderAar.js";
+export { GUIDE } from "./guide.js";
+
 import { parseTrace } from "./parseTrace.js";
 import { parseAarTestimony } from "./parseAar.js";
 import { reconcile } from "./reconcile.js";
