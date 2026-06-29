@@ -1,0 +1,28 @@
+{
+  "status": "partial",
+  "summary": "partial: 1 claimed action(s) verified, 0 unsupported, 0 omitted, 0 contradicted, 1 evidence gap(s).",
+  "claimed_actions": [
+    {
+      "claim": "Edited `o27/engine/baserunning.py` to lower the extra-base advance rate",
+      "matched_events": [
+        "ev-2"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "omitted_actions": [],
+  "unsupported_claims": [],
+  "contradicted_claims": [],
+  "evidence_gaps": [
+    {
+      "issue": "Ran the suite",
+      "missing_evidence": "a test event is present but its output records no pass/fail result"
+    }
+  ],
+  "review": {
+    "needs_human_review": false,
+    "reasons": [],
+    "recommended_next_questions": []
+  },
+  "run_id": "run-gap"
+}

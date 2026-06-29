@@ -1,0 +1,35 @@
+{
+  "status": "contradicted",
+  "summary": "contradicted: 1 claimed action(s) verified, 0 unsupported, 0 omitted, 1 contradicted, 0 evidence gap(s).",
+  "claimed_actions": [
+    {
+      "claim": "Changed `o27v2/web/box_text.py` to read the per-game decision instead of season totals",
+      "matched_events": [
+        "ev-2"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "omitted_actions": [],
+  "unsupported_claims": [],
+  "contradicted_claims": [
+    {
+      "claim": "Left `o27v2/web/app.py` untouched",
+      "trace_evidence": [
+        "ev-3"
+      ],
+      "reason": "testimony states this was deliberately not done, but the trace shows a file_write on o27v2/web/app.py"
+    }
+  ],
+  "evidence_gaps": [],
+  "review": {
+    "needs_human_review": true,
+    "reasons": [
+      "the testimony contradicts the trace"
+    ],
+    "recommended_next_questions": [
+      "The AAR says \"Left `o27v2/web/app.py` untouched\", but the trace shows otherwise — which account is correct?"
+    ]
+  },
+  "run_id": "run-contra"
+}

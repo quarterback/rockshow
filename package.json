@@ -1,0 +1,66 @@
+{
+  "name": "closedtab",
+  "version": "0.1.0",
+  "description": "closedtab — Agent AAR Reconciliation Tool. Reconcile an After-Action Report (testimony) against a machine trace of what an agent actually did.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "closedtab",
+    "aar",
+    "after-action-report",
+    "agent",
+    "reconciliation",
+    "trace",
+    "audit",
+    "mcp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quarterback/rockshow.git"
+  },
+  "homepage": "https://github.com/quarterback/rockshow#readme",
+  "bugs": {
+    "url": "https://github.com/quarterback/rockshow/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "closedtab": "dist/cli.js",
+    "oi": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "WHY.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build && npm test",
+    "dev": "tsx src/cli.ts",
+    "oi": "tsx src/cli.ts",
+    "mcp": "tsx src/mcp.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "corpus-report": "tsx scripts/corpus-report.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

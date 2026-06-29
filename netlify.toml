@@ -1,0 +1,14 @@
+[build]
+  command = "npm run build"
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Serve the function under the same path the UI uses on Vercel, so public/
+# index.html works unchanged on both platforms.
+[[redirects]]
+  from = "/api/reconcile"
+  to = "/.netlify/functions/reconcile"
+  status = 200

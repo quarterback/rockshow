@@ -1,0 +1,44 @@
+{
+  "status": "insufficient_trace",
+  "summary": "insufficient_trace: 1 claimed action(s) verified, 3 unsupported, 0 omitted, 0 contradicted, 0 evidence gap(s).",
+  "claimed_actions": [
+    {
+      "claim": "Make sacrifice bunts less common",
+      "matched_events": [
+        "ev-1"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "omitted_actions": [],
+  "unsupported_claims": [
+    {
+      "claim": "Edited `o27/engine/prob.py` to lower the bunt-attempt rate",
+      "reason": "claimed work on o27/engine/prob.py, prob.py; no file_write/git_diff/command event targets it"
+    },
+    {
+      "claim": "Added a regression test in `o27/tests/test_bunting.py`",
+      "reason": "claimed work on o27/tests/test_bunting.py, test_bunting.py; no file_write/git_diff/command event targets it"
+    },
+    {
+      "claim": "Ran `pytest o27/tests`",
+      "reason": "claimed command `pytest o27/tests`; no command/test event matches it"
+    }
+  ],
+  "contradicted_claims": [],
+  "evidence_gaps": [],
+  "review": {
+    "needs_human_review": true,
+    "reasons": [
+      "the trace has no consequential events to verify action claims against",
+      "3 claim(s) have no trace evidence"
+    ],
+    "recommended_next_questions": [
+      "The AAR claims \"Edited `o27/engine/prob.py` to lower the bunt-attempt rate\" but the trace has no matching evidence — did this actually happen?",
+      "The AAR claims \"Added a regression test in `o27/tests/test_bunting.py`\" but the trace has no matching evidence — did this actually happen?",
+      "The AAR claims \"Ran `pytest o27/tests`\" but the trace has no matching evidence — did this actually happen?",
+      "The trace has no file-write/command/git_diff events to verify the AAR against — can you attach a fuller trace?"
+    ]
+  },
+  "run_id": "run-insuf"
+}

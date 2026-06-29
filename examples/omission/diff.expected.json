@@ -1,0 +1,39 @@
+{
+  "status": "partial",
+  "summary": "partial: 1 claimed action(s) verified, 0 unsupported, 2 omitted, 0 contradicted, 0 evidence gap(s).",
+  "claimed_actions": [
+    {
+      "claim": "Updated `o27v2/web/standings.py` to batch the per-team record lookup into one query",
+      "matched_events": [
+        "ev-2"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "omitted_actions": [
+    {
+      "event_id": "ev-3",
+      "summary": "add a composite index on (season_id, team_id)",
+      "reason": "consequential file_write event present in the trace but not mentioned in the testimony"
+    },
+    {
+      "event_id": "ev-4",
+      "summary": "apply the migration",
+      "reason": "consequential command event present in the trace but not mentioned in the testimony"
+    }
+  ],
+  "unsupported_claims": [],
+  "contradicted_claims": [],
+  "evidence_gaps": [],
+  "review": {
+    "needs_human_review": true,
+    "reasons": [
+      "2 trace action(s) go unmentioned in the testimony"
+    ],
+    "recommended_next_questions": [
+      "The trace shows a \"add a composite index on (season_id, team_id)\" action but the AAR doesn't mention it — was this part of the task?",
+      "The trace shows a \"apply the migration\" action but the AAR doesn't mention it — was this part of the task?"
+    ]
+  },
+  "run_id": "run-omit"
+}

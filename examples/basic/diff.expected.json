@@ -1,0 +1,44 @@
+{
+  "status": "aligned",
+  "summary": "aligned: 4 claimed action(s) verified, 0 unsupported, 0 omitted, 0 contradicted, 0 evidence gap(s).",
+  "claimed_actions": [
+    {
+      "claim": "Add a pitch-count column to the box score so each pitcher's total pitches render next to their line",
+      "matched_events": [
+        "ev-1"
+      ],
+      "confidence": "low"
+    },
+    {
+      "claim": "Edited `o27v2/web/box_text.py` to render a `Pit` column in the pitcher table",
+      "matched_events": [
+        "ev-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "claim": "Updated `o27v2/web/app.py` to pass the per-pitcher pitch totals into the view",
+      "matched_events": [
+        "ev-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "claim": "Ran the test suite with `pytest o27v2/tests`",
+      "matched_events": [
+        "ev-4"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "omitted_actions": [],
+  "unsupported_claims": [],
+  "contradicted_claims": [],
+  "evidence_gaps": [],
+  "review": {
+    "needs_human_review": false,
+    "reasons": [],
+    "recommended_next_questions": []
+  },
+  "run_id": "run-basic"
+}
