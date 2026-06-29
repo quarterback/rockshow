@@ -1,10 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
-  "outputDirectory": "public",
-  "functions": {
-    "api/reconcile.ts": {
-      "runtime": "@vercel/node@latest"
-    }
-  }
+  "outputDirectory": "public"
 }
