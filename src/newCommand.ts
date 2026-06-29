@@ -7,7 +7,7 @@ import type { Readable, Writable } from "node:stream";
 import { TEMPLATES, getTemplate, type Template } from "./templates.js";
 import {
   renderAar,
-  aarFilename,
+  docFilename,
   type AarMeta,
   type Answers,
 } from "./renderAar.js";
@@ -122,7 +122,7 @@ export async function runNew(
   const out = io.output ?? stdout;
   const rl = readline.createInterface({ input, output: out });
   try {
-    out.write("closedtab: new After-Action Report\n");
+    out.write("closedtab: a new doc for a human-agent team\n");
 
     const template = await chooseTemplate(rl, out, opts.type);
 
@@ -145,7 +145,7 @@ export async function runNew(
     }
 
     const dir = resolveDir(opts.dir);
-    const path = uniquePath(dir, aarFilename(title));
+    const path = uniquePath(dir, docFilename(template, title));
     writeFileSync(path, renderAar(template, meta, answers), "utf8");
 
     out.write(`\n✓ Wrote ${path}\n`);

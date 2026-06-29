@@ -24,7 +24,12 @@ export function slugify(title: string): string {
   return slug || "untitled";
 }
 
-/** The filename an AAR is written to, e.g. "aar-fix-pitcher-w-l.md". */
+/** The filename a doc is written to, e.g. "aar-fix-pitcher-w-l.md" or "adr-x.md". */
+export function docFilename(template: Template, title: string): string {
+  return `${template.filePrefix}-${slugify(title)}.md`;
+}
+
+/** Back-compat helper: the aar-prefixed filename for a title. */
 export function aarFilename(title: string): string {
   return `aar-${slugify(title)}.md`;
 }
@@ -56,7 +61,7 @@ function renderSection(section: SectionSpec, answer: string | undefined): string
  * authored non-interactively.
  */
 export function renderAar(template: Template, meta: AarMeta, answers: Answers): string {
-  const header = `# AAR: ${meta.title.trim()}\n\n${metaLine(meta)}\n`;
+  const header = `# ${template.docLabel}: ${meta.title.trim()}\n\n${metaLine(meta)}\n`;
   const body = template.sections
     .map((s) => renderSection(s, answers[s.id]))
     .join("\n");

@@ -19,20 +19,35 @@ describe("slugify", () => {
 });
 
 describe("templates", () => {
-  it("ships the four expected templates", () => {
+  it("ships the expected templates with doc labels and file prefixes", () => {
     expect(TEMPLATES.map((t) => t.id).sort()).toEqual([
+      "adr",
       "bugfix",
       "feature",
       "generic",
+      "handoff",
       "investigation",
+      "proposal",
     ]);
+    // Doc type drives the title label and the filename prefix.
+    expect(getTemplate("adr")!.docLabel).toBe("ADR");
+    expect(getTemplate("adr")!.filePrefix).toBe("adr");
+    expect(getTemplate("handoff")!.filePrefix).toBe("handoff");
+    expect(getTemplate("generic")!.docLabel).toBe("AAR");
   });
-  it("every template has a decisions / design / follow-ups section", () => {
+  it("every AAR template prompts for decisions / design / follow-ups", () => {
     // The section that ages best: deliberate choices and known gaps.
-    for (const t of TEMPLATES) {
-      const hasDecisions = t.sections.some((s) => /decision|follow-?up/i.test(s.heading));
+    for (const t of TEMPLATES.filter((t) => t.filePrefix === "aar")) {
+      const hasDecisions = t.sections.some((s) =>
+        /decision|follow-?up|recommend/i.test(s.heading),
+      );
       expect(hasDecisions, `${t.id} should prompt for decisions/follow-ups`).toBe(true);
     }
+  });
+  it("AAR templates carry a 'for the next agent' breadcrumb section where it fits", () => {
+    // generic and feature explicitly leave breadcrumbs for the next agent.
+    expect(getTemplate("generic")!.sections.some((s) => s.id === "next_agent")).toBe(true);
+    expect(getTemplate("feature")!.sections.some((s) => s.id === "next_agent")).toBe(true);
   });
 });
 

@@ -1,22 +1,33 @@
 # WHY
 
+## Who this is for: human-agent teams
+
+`closedtab` is built for human-agent teams. A person and one or more AI agents do
+work across a sprint, or a stack of sprints, and that work needs a memory the
+whole team can carry: the human, the agent that did this segment, the agent that
+picks up the next one, and the agent re-reading it three sprints later. These are
+not human-human retrospectives; those exist and are a different thing. This is the
+shared record a human-agent team leaves so the next tab opens where the last one
+closed.
+
 ## Start with the habit, not the audit
 
-`closedtab` is two things, in order of importance. First and foremost it helps you
-**write** After-Action Reports, because almost nobody does, and the practice is
-worth more than any tool built on top of it. An AAR is a two-minute note at the
-end of a task: what was asked, what you did, why you did it that way, and the
-decisions worth remembering. Writing them is the whole point; the structure and
-the guided prompts exist to lower the friction until it's a habit.
+`closedtab` is two things, in order of importance. First and foremost it helps the
+team **write** these docs, because almost nobody does, and the practice is worth
+more than any tool built on top of it. A doc is a two-minute note at the end of a
+segment of work: what the owner asked, what the agent did, why it was done that
+way, and the decisions worth remembering. Writing them is the whole point; the
+structure and the guided prompts exist to lower the friction until it's a habit.
 
-The most durable section is decisions and follow-ups: the choices you made on
-purpose and the gaps you already know about. That is the part the next person
-relies on, and it is exactly how a good `CLAUDE.md` reads, a list of deliberate
-calls labeled so nobody reverts them by accident. The value of an AAR is the
-record of decisions it leaves behind.
+Two sections carry the human-agent signal. **Decisions and follow-ups** records
+the deliberate choices and *who made them*, owner or agent or joint, which is the
+thing a future agent most needs and most often lacks. **For the next agent** is
+the breadcrumb trail: the open hooks left in the code, the gotchas burned in
+during the build, and what not to touch. That is exactly how a good `CLAUDE.md`
+reads, a list of deliberate calls labeled so nobody reverts them by accident.
 
 The second thing, reconciliation, only makes sense once the first exists. It
-presupposes you *have* AARs to check. If nobody writes them, an audit tool has no
+presupposes you *have* docs to check. If nobody writes them, an audit tool has no
 input. So authoring is the front door, and the rest of this document is about the
 audit layer you grow into later.
 
