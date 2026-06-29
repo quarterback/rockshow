@@ -1,15 +1,18 @@
-# closedtab: review the work your AI agents do
+# closedtab: a shared record for human-agent teams
 
-An AI agent finishes a task. closedtab helps you review what it did and keep a
-record. The record is a short, comparable artifact built around one idea:
-outputs are easy to measure, judgment is hard. It surfaces the decisions the
-agent made on its own, the moments a human should have been in the loop, the
-places it was confidently wrong, and what that cost or risked.
+You move fast with AI agents and ship a lot, and the reasoning behind a decision
+evaporates almost immediately. You knew what you wanted and how you wanted it;
+the agent took a different path; and a week later, mid-debug, you are trying to
+reconstruct what actually happened. closedtab keeps that record: what you asked
+for, what the agent did, and what the agent understood the directive to be.
+
+It is how you pass the baton between agents, keep a multi-agent run legible,
+track the decisions and the bugs and fixes along the way, and get better at the
+handoff itself. As much about working well with agents as it is about provenance.
 
 It works best when you stay hands-on: you as the product owner, agents as
-engineer or PM. Run it feature by feature, on the work you are steering. Read the
-records across many runs, where patterns in the Deviation and Change sections
-tell you more than any single review.
+engineer or PM. Run it feature by feature, on the work you are steering, and the
+records add up into a history of how the project actually got built.
 
 ```
 npm install -g closedtab
@@ -21,7 +24,7 @@ npm install -g closedtab
 closedtab new
 ```
 
-It scaffolds a dated **Agent Action Record** to fill in: a six-part review of one
+It scaffolds a dated **Agent Action Record** to fill in: a six-part record of one
 agent run.
 
 | Part | What it captures |
@@ -42,7 +45,7 @@ six sections in order, no AI required, and keep the record.
 closedtab check ./docs/aar-fall-portal.md
 ```
 
-Scores a record on whether it surfaced the things that matter: the intent, the
+Scores a record on whether it captured what is worth keeping: the intent, the
 reasoning, who decided, how it held up, the deviations, and the risks carried
 forward.
 
