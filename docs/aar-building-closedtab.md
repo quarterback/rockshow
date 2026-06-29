@@ -1,6 +1,6 @@
 # AAR — building closedtab
 
-**Date:** 2026-06-29 · **Repo:** `quarterback/rockshow` · **Branch:** `claude/agent-aar-reconciliation-93fwaw` · **PRs:** #1 (merged), #2 (open)
+**Date:** 2026-06-29 · **Repo:** `quarterback/closedtab` · **Branch:** `claude/agent-aar-reconciliation-93fwaw` · **PRs:** #1 (merged), #2 (open)
 
 > Written in the format the tool itself produces — this is closedtab eating its
 > own dog food. It's for me; it's honest about the wrong turn.

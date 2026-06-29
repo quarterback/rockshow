@@ -21,11 +21,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/quarterback/rockshow.git"
+    "url": "git+https://github.com/quarterback/closedtab.git"
   },
-  "homepage": "https://github.com/quarterback/rockshow#readme",
+  "homepage": "https://github.com/quarterback/closedtab#readme",
   "bugs": {
-    "url": "https://github.com/quarterback/rockshow/issues"
+    "url": "https://github.com/quarterback/closedtab/issues"
   },
   "publishConfig": {
     "access": "public"

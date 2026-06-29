@@ -81,7 +81,7 @@ ships only `dist/` + the docs.
   and gives you the old feature set.
 - **Authoring (`new`/`guide`) is version `0.2.0`** — built, tested, committed,
   **but NOT published to npm yet.** To get it live you publish 0.2.0.
-- **GitHub:** repo is `quarterback/rockshow`.
+- **GitHub:** repo is `quarterback/closedtab`.
   - **PR #1** (the v0 reconcile tool + deploy + naming) — **merged** into `main`.
   - **PR #2** (open) — started as the Vercel build fix, but now also contains the
     npm publishing workflow *and* the 0.2.0 authoring feature, because it was all
