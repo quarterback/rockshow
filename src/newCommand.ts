@@ -7,7 +7,7 @@ import type { Readable, Writable } from "node:stream";
 import { TEMPLATES, getTemplate, type Template } from "./templates.js";
 import {
   renderAar,
-  aarFilename,
+  docFilename,
   type AarMeta,
   type Answers,
 } from "./renderAar.js";
@@ -43,7 +43,7 @@ async function readSection(
 ): Promise<string> {
   out.write(`\n## ${heading}\n  ${guidance}\n`);
   out.write(
-    `  (write as many lines as you like; finish with a line containing just "." — or press Enter now to skip)\n`,
+    `  (write as many lines as you like; finish with a line containing just "." or press Enter now to skip)\n`,
   );
   const lines: string[] = [];
   for (;;) {
@@ -63,7 +63,7 @@ async function chooseTemplate(
   if (preset) {
     const t = getTemplate(preset);
     if (t) return t;
-    out.write(`Unknown template "${preset}" — pick one below.\n`);
+    out.write(`Unknown template "${preset}", pick one below.\n`);
   }
   out.write("\nPick a template:\n");
   TEMPLATES.forEach((t, i) => {
@@ -122,7 +122,7 @@ export async function runNew(
   const out = io.output ?? stdout;
   const rl = readline.createInterface({ input, output: out });
   try {
-    out.write("closedtab — new After-Action Report\n");
+    out.write("closedtab: a new doc for a human-agent team\n");
 
     const template = await chooseTemplate(rl, out, opts.type);
 
@@ -137,7 +137,7 @@ export async function runNew(
     const meta: AarMeta = { title, date: todayIso(), branch, pr, commit };
 
     out.write(
-      `\nNow the sections. Skip any you don't have yet — a skipped section keeps its guidance as a comment so you can fill it in later.\n`,
+      `\nNow the sections. Skip any you don't have yet, a skipped section keeps its guidance as a comment so you can fill it in later.\n`,
     );
     const answers: Answers = {};
     for (const section of template.sections) {
@@ -145,7 +145,7 @@ export async function runNew(
     }
 
     const dir = resolveDir(opts.dir);
-    const path = uniquePath(dir, aarFilename(title));
+    const path = uniquePath(dir, docFilename(template, title));
     writeFileSync(path, renderAar(template, meta, answers), "utf8");
 
     out.write(`\n✓ Wrote ${path}\n`);

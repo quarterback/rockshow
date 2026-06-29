@@ -1,47 +1,59 @@
-// The "how to write AARs" explainer, printed by `closedtab guide`. Teaches the
-// practice, not just the format — the point of the tool is the habit.
+// The "how to write these docs" explainer, printed by `closedtab guide`.
+// Teaches the practice for human-agent teams, not just the format.
 
-export const GUIDE = `How to write an After-Action Report (AAR)
+export const GUIDE = `Writing docs for a human-agent team
 
-An AAR is a short note you write when you finish a chunk of work — a bug fix, a
-feature, an investigation, a weekend hack. It records what was asked, what you
-did, and (most importantly) what you deliberately did NOT do. It takes two
-minutes and saves future-you an hour of "wait, did I already try that?"
+closedtab is for human-agent teams: a person and one or more AI agents doing
+work across a sprint, or a stack of sprints. The docs it writes are the
+breadcrumb trail. When you (or a future agent, or a past one) come back, the
+trail tells you what was asked, what got done, what was decided and by whom,
+what's deliberately left, and where to pick up.
 
-You don't need a process or a team. Write one for yourself. The habit is the
-point: once you have a few, you'll wonder how you worked without them.
+Write one for every useful segment of work: a bug fix, a feature, a tuning pass,
+a decision, a handoff at the end of a session. Many people do it every PR. The
+agent did the work; the doc is how the team keeps a shared memory of it.
 
-The shape (headers are freeform — these are just the load-bearing parts):
+The load-bearing parts:
 
   1. What was asked for
-     The request in the asker's own words (even if the asker was you).
+     The owner's request, in their words. Quote it. This is the contract the
+     work is checked against.
 
   2. What changed
-     What you actually did. Name files with exact paths, commits, PRs — the
-     specifics are what make it findable and checkable later.
+     What the agent actually did. Name files, commits, PRs with exact paths, so
+     the next agent can trace it (and so closedtab can reconcile it later).
 
-  3. What I did NOT do
-     The honest part, and the most valuable. Deliberate non-changes, follow-ups
-     you're punting, things you didn't get to or chose to skip. This is what
-     stops the next person (or future-you) from guessing.
+  3. Decisions and follow-ups
+     The part that ages best. The deliberate choices, who made them (owner,
+     agent, or joint), and any call the agent inferred that the owner should
+     sanity-check. Plus the known gaps and deferred follow-ups. This is exactly
+     how a good CLAUDE.md reads: settled calls, labeled so nobody reverts them.
 
-  4. Validation
-     How you know it works: tests you ran, what you checked by hand. "Didn't
-     verify X" is a perfectly good, useful answer.
+  4. Verified
+     How you know it works, stated so it's checkable against the repo.
 
-Three habits that make AARs worth re-reading:
+  5. For the next agent
+     The breadcrumbs: open hooks left in the code, gotchas burned in during the
+     build, what NOT to touch, and any question that needs an owner decision
+     before the work continues.
 
-  - Be concrete. "Fixed the bug" tells you nothing in six months. "Changed the
-    decision map in app.py to read per-game W/L instead of season totals" does.
-  - Be honest about gaps. The value is in what you admit you didn't do.
-  - Keep them together. A docs/ folder of aar-*.md files becomes a real memory
-    of a project.
+It's not only AARs. closedtab new also writes decision records (ADR), sprint
+handoffs (state, what's open, what not to touch, owner questions), and forward
+proposals. Pick the shape that fits the work.
+
+Three habits that make these worth re-reading:
+
+  - Be concrete. Exact paths, commits, line ranges. Vague notes rot.
+  - Record who decided. Owner vs. agent vs. joint is the human-agent signal.
+  - Leave breadcrumbs. The next agent inherits your open hooks and your gotchas.
 
 Get started:
 
   closedtab new          Walks you through one, question by question, and writes
-                         a dated aar-<slug>.md file.
+                         a dated, prefixed file (aar-*, adr-*, handoff-*, ...).
+  closedtab check FILE   Scores a doc on whether it left the right breadcrumbs.
 
-Later, once you have AARs and a record of what actually happened, closedtab can
-reconcile the two — but that's a bonus. Writing them is the whole point.
+Later, once you have these docs and a record of what actually happened,
+closedtab reconcile checks the claims against the run: done vs. requested vs.
+left. Writing them is the whole point; the checking is the payoff.
 `;

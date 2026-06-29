@@ -34,10 +34,10 @@
       "3 claim(s) have no trace evidence"
     ],
     "recommended_next_questions": [
-      "The AAR claims \"Edited `o27/engine/prob.py` to lower the bunt-attempt rate\" but the trace has no matching evidence — did this actually happen?",
-      "The AAR claims \"Added a regression test in `o27/tests/test_bunting.py`\" but the trace has no matching evidence — did this actually happen?",
-      "The AAR claims \"Ran `pytest o27/tests`\" but the trace has no matching evidence — did this actually happen?",
-      "The trace has no file-write/command/git_diff events to verify the AAR against — can you attach a fuller trace?"
+      "The AAR claims \"Edited `o27/engine/prob.py` to lower the bunt-attempt rate\" but the trace has no matching evidence, did this actually happen?",
+      "The AAR claims \"Added a regression test in `o27/tests/test_bunting.py`\" but the trace has no matching evidence, did this actually happen?",
+      "The AAR claims \"Ran `pytest o27/tests`\" but the trace has no matching evidence, did this actually happen?",
+      "The trace has no file-write/command/git_diff events to verify the AAR against, can you attach a fuller trace?"
     ]
   },
   "run_id": "run-insuf"

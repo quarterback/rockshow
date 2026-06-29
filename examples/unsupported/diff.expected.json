@@ -32,7 +32,7 @@
       "1 claim(s) have no trace evidence"
     ],
     "recommended_next_questions": [
-      "The AAR claims \"Ran the full suite with `pytest`\" but the trace has no matching evidence — did this actually happen?"
+      "The AAR claims \"Ran the full suite with `pytest`\" but the trace has no matching evidence, did this actually happen?"
     ]
   },
   "run_id": "run-unsup"

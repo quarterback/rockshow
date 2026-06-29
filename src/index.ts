@@ -11,9 +11,11 @@ export { classifyHeading } from "./anchors.js";
 // AAR authoring
 export { TEMPLATES, getTemplate } from "./templates.js";
 export type { Template, SectionSpec } from "./templates.js";
-export { renderAar, slugify, aarFilename } from "./renderAar.js";
+export { renderAar, slugify, docFilename, aarFilename } from "./renderAar.js";
 export type { AarMeta, Answers } from "./renderAar.js";
 export { GUIDE } from "./guide.js";
+export { checkDoc, formatCheck } from "./check.js";
+export type { CheckResult, QualityDimension } from "./check.js";
 
 import { parseTrace } from "./parseTrace.js";
 import { parseAarTestimony } from "./parseAar.js";

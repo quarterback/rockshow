@@ -1,15 +1,17 @@
 {
   "name": "closedtab",
-  "version": "0.2.0",
-  "description": "Write After-Action Reports (AARs) the easy way — guided, structured, two minutes. Plus an optional reconcile step that checks an AAR against a trace of what actually happened.",
+  "version": "0.3.0",
+  "description": "Docs for human-agent teams: write the AARs, ADRs, handoffs and proposals that track work across sprints, score them, and reconcile a doc against a trace of what the agent actually did.",
   "type": "module",
   "license": "MIT",
   "keywords": [
     "closedtab",
     "aar",
     "after-action-report",
+    "adr",
+    "handoff",
+    "human-agent",
     "documentation",
-    "changelog",
     "scaffold",
     "agent",
     "reconciliation",
@@ -30,6 +32,7 @@
   },
   "bin": {
     "closedtab": "dist/cli.js",
+    "closedtab-mcp": "dist/mcp.js",
     "oi": "dist/cli.js"
   },
   "main": "dist/index.js",

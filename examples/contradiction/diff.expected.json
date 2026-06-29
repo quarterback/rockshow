@@ -28,7 +28,7 @@
       "the testimony contradicts the trace"
     ],
     "recommended_next_questions": [
-      "The AAR says \"Left `o27v2/web/app.py` untouched\", but the trace shows otherwise — which account is correct?"
+      "The AAR says \"Left `o27v2/web/app.py` untouched\", but the trace shows otherwise, which account is correct?"
     ]
   },
   "run_id": "run-contra"

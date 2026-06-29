@@ -45,19 +45,19 @@ describe("runNew (interactive authoring)", () => {
       "the W column showed season totals", ".", // reported
       "`_aggregate_pitcher_rows` copied season W/L", ".", // root cause
       "edited `o27v2/web/app.py`", ".", // fix
-      ".", // not_done -> skipped
-      "ran `pytest o27v2/tests`", ".", // validation
+      ".", // decisions -> skipped
+      "ran `pytest o27v2/tests`", ".", // verified
     ];
     const path = await runNew({ type: "bugfix", title: "Fix pitcher W/L", dir }, drive(answers));
 
     expect(path).toBe(join(dir, "aar-fix-pitcher-w-l.md"));
     const md = readFileSync(path, "utf8");
-    expect(md).toContain("# AAR — Fix pitcher W/L");
+    expect(md).toContain("# AAR: Fix pitcher W/L");
     expect(md).toContain("## Root cause");
     expect(md).toContain("`_aggregate_pitcher_rows` copied season W/L");
     expect(md).toContain("edited `o27v2/web/app.py`");
     // skipped section keeps its guidance comment
-    expect(md).toMatch(/## What I did NOT do[\s\S]*<!--/);
+    expect(md).toMatch(/## Decisions and follow-ups[\s\S]*<!--/);
   });
 
   it("does not overwrite an existing AAR — picks a -2 suffix", async () => {

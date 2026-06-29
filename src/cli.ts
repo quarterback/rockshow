@@ -3,16 +3,18 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { reconcileText } from "./index.js";
 import { runNew } from "./newCommand.js";
 import { GUIDE } from "./guide.js";
+import { checkDoc, formatCheck } from "./check.js";
 
-// Thin CLI over the closedtab core. Three commands:
+// Thin CLI over the closedtab core, for human-agent teams:
 //
-//   closedtab new [title] [--type bugfix|feature|investigation|generic]
+//   closedtab new [title] [--type generic|bugfix|feature|investigation|adr|handoff|proposal]
 //   closedtab guide
+//   closedtab check <file.md>
 //   closedtab reconcile --testimony <file.md> --trace <file.jsonl|json> [--out <diff.json>]
 //
-// Authoring (`new`) is the front door — write AARs the way you'd want to read
-// them. `reconcile` is the advanced step: once you have an AAR and a record of
-// what actually happened, check one against the other.
+// Authoring (`new`) is the front door: write the doc the way you'd want to read
+// it three sprints later. `check` scores the breadcrumbs. `reconcile` is the
+// advanced step: check a doc's claims against a record of what actually happened.
 
 type Args = { [k: string]: string | boolean | string[]; _: string[] };
 
@@ -37,17 +39,20 @@ function parseArgs(argv: string[]): { command: string; args: Args } {
   return { command, args };
 }
 
-const USAGE = `closedtab — write After-Action Reports (and, later, check them)  (alias: oi)
+const USAGE = `closedtab: docs for human-agent teams  (alias: oi)
 
 Usage:
-  closedtab new [title] [--type bugfix|feature|investigation|generic] [--dir docs]
-      Walk through a new AAR question by question and write a dated aar-<slug>.md.
+  closedtab new [title] [--type generic|bugfix|feature|investigation|adr|handoff|proposal] [--dir docs]
+      Walk through a new doc question by question; write a dated, prefixed file.
 
   closedtab guide
-      Print a short how-to on writing AARs and why they're worth the two minutes.
+      Print a short how-to on writing these docs and why they pay off.
+
+  closedtab check <file.md>
+      Score a doc on the breadcrumbs a human-agent team needs.
 
   closedtab reconcile --testimony <file.md> --trace <file.jsonl|file.json> [--out <diff.json>]
-      Check an AAR (testimony) against a machine trace of what actually happened.
+      Check a doc's claims against a machine trace of what actually happened.
 
   -h, --help    Show this help.`;
 
@@ -86,7 +91,7 @@ function reconcileCommand(args: Args): number {
   const json = JSON.stringify(diff, null, 2);
   if (typeof args.out === "string") {
     writeFileSync(args.out, json + "\n", "utf8");
-    console.error(`closedtab: ${diff.status} — wrote ${args.out}`);
+    console.error(`closedtab: ${diff.status}, wrote ${args.out}`);
   } else {
     console.log(json);
   }
@@ -114,6 +119,23 @@ async function main(): Promise<number> {
     case "guide":
       console.log(GUIDE);
       return 0;
+    case "check": {
+      const file = args._[0] ?? (typeof args.file === "string" ? args.file : undefined);
+      if (typeof file !== "string") {
+        console.error("closedtab check: pass a markdown file to score.\n");
+        console.error(USAGE);
+        return 2;
+      }
+      let md: string;
+      try {
+        md = readFileSync(file, "utf8");
+      } catch (e) {
+        console.error(`closedtab: cannot read "${file}": ${(e as Error).message}`);
+        return 2;
+      }
+      console.log(formatCheck(checkDoc(md), file));
+      return 0; // a nudge, not a gate
+    }
     case "reconcile":
       return reconcileCommand(args);
     default:
