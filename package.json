@@ -1,10 +1,11 @@
 {
-  "name": "@local/aar-reconcile",
+  "name": "@quarterback/tabbycat",
   "version": "0.1.0",
-  "description": "Agent AAR Reconciliation Tool — reconcile an After-Action Report (testimony) against a machine trace of what an agent actually did.",
+  "description": "Tabbycat — Agent AAR Reconciliation Tool. Reconcile an After-Action Report (testimony) against a machine trace of what an agent actually did.",
   "type": "module",
   "license": "MIT",
   "keywords": [
+    "tabbycat",
     "aar",
     "after-action-report",
     "agent",
@@ -25,6 +26,7 @@
     "access": "public"
   },
   "bin": {
+    "tabbycat": "dist/cli.js",
     "oi": "dist/cli.js"
   },
   "main": "dist/index.js",

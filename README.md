@@ -1,14 +1,15 @@
-# oi — Agent AAR Reconciliation Tool
+# tabbycat — Agent AAR Reconciliation Tool
 
 Reconcile what an agent **said it did** (an After-Action Report) against what the
 trace shows it **actually did**.
 
 ```bash
-npm install -g @local/aar-reconcile
+npm install -g @quarterback/tabbycat
 ```
 
 ```bash
-oi reconcile --testimony ./testimony.md --trace ./trace.jsonl --out ./diff.json
+tabbycat reconcile --testimony ./testimony.md --trace ./trace.jsonl --out ./diff.json
+# `oi` is a short alias for `tabbycat`
 ```
 
 The AAR says it left a file untouched; the trace shows a write to it. The diff
@@ -89,7 +90,7 @@ The CLI is a thin wrapper over a pure core; the MCP server is a second surface
 over the identical `reconcile()`.
 
 ```ts
-import { reconcileText, reconcile, parseAarTestimony, parseTrace } from "@local/aar-reconcile";
+import { reconcileText, reconcile, parseAarTestimony, parseTrace } from "@quarterback/tabbycat";
 
 const diff = reconcileText(testimonyMarkdown, traceJsonlText);
 ```
@@ -125,16 +126,13 @@ transport instead of stdio.
 
 ## Publish to npm
 
-The package name in `package.json` (`@local/aar-reconcile`) is a placeholder —
-`@local` is not a publishable scope. First pick a real name:
+Published as **`@quarterback/tabbycat`** (the bare `tabbycat` name was taken;
+this uses the project's own scope). `publishConfig.access` is already `public`.
 
 ```bash
-# pick ONE and set it as "name" in package.json:
-#   unscoped:  aar-reconcile           (check it's free: npm view aar-reconcile)
-#   scoped:    @yourname/aar-reconcile (publishConfig.access is already "public")
 npm login
 npm publish        # runs prepublishOnly: clean -> build -> test, then ships dist/
-npm view <name>    # verify
+npm view @quarterback/tabbycat   # verify
 ```
 
 Cutting later releases:
@@ -145,8 +143,9 @@ git push --follow-tags
 npm publish
 ```
 
-After publishing, users get the CLI with `npm i -g <name>` (`oi reconcile …`) or
-`npx <name> reconcile …`, and the library/MCP via `import` / `node dist/mcp.js`.
+After publishing, users get the CLI with `npm i -g @quarterback/tabbycat`
+(`tabbycat reconcile …`, or the `oi` alias) or `npx @quarterback/tabbycat
+reconcile …`, and the library/MCP via `import` / `node dist/mcp.js`.
 
 ## Develop
 
