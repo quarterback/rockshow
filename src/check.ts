@@ -93,17 +93,17 @@ const LABELS: Record<QualityDimension, string> = {
   rationale: "rationale (the why)",
   delegation: "delegation record (who decided)",
   validation: "validation",
-  negative_space: "negative space (what wasn't done)",
+  negative_space: "follow-ups and known gaps",
   residual_risk: "residual risks",
 };
 
 const SUGGESTIONS: Record<QualityDimension, string> = {
   scope: "State what the owner asked for, in their words.",
-  rationale: "Record why it was done this way, not just what changed.",
+  rationale: "Record why it was done this way, beyond what changed.",
   delegation:
     "Note who decided what (owner / agent / joint), and flag any call the agent inferred.",
   validation: "Say how you know it works: tests run, what you checked.",
-  negative_space: "List what you deliberately did NOT do, and the follow-ups left.",
+  negative_space: "List the follow-ups you left and the parts you scoped out for later.",
   residual_risk: "Name the known gaps, risks, or open questions carried forward.",
 };
 

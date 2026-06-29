@@ -32,6 +32,7 @@
   },
   "bin": {
     "closedtab": "dist/cli.js",
+    "closedtab-mcp": "dist/mcp.js",
     "oi": "dist/cli.js"
   },
   "main": "dist/index.js",
