@@ -44,10 +44,10 @@ function metaString(ev: TraceEvent): string {
 
 /**
  * Score how strongly one claim matches one event. Strongest signal wins:
- *   3 high   — an exact identifier match (file path == event target, command
+ *   3 high   : an exact identifier match (file path == event target, command
  *              == command event, commit/PR token present in summary/metadata)
- *   2 medium — an identifier appears as a substring of summary/target
- *   1 low    — only a verb or quoted token overlaps; no identifier anchor
+ *   2 medium : an identifier appears as a substring of summary/target
+ *   1 low    : only a verb or quoted token overlaps; no identifier anchor
  *   0 none
  * The matcher is deliberately plain so a reader can see why a claim matched.
  */
@@ -178,7 +178,7 @@ export function reconcile(
     if (claim.kind === "action" || claim.kind === "intent") {
       // Evidence gap: a "tests passed" style claim where a test event exists
       // but records no pass/fail result. The pass/fail is unverifiable from the
-      // trace as given — that is a gap, not an unsupported claim.
+      // trace as given, that is a gap, not an unsupported claim.
       const isEvidenceGap =
         TEST_CLAIM_RE.test(claim.text) &&
         hasTestEvent &&
@@ -351,22 +351,22 @@ function buildQuestions(
   const qs: string[] = [];
   for (const o of omitted) {
     qs.push(
-      `The trace shows a ${o.summary ? `"${o.summary}"` : o.event_id} ${"action"} but the AAR doesn't mention it — was this part of the task?`,
+      `The trace shows a ${o.summary ? `"${o.summary}"` : o.event_id} ${"action"} but the AAR doesn't mention it, was this part of the task?`,
     );
   }
   for (const u of unsupported) {
     qs.push(
-      `The AAR claims "${u.claim}" but the trace has no matching evidence — did this actually happen?`,
+      `The AAR claims "${u.claim}" but the trace has no matching evidence, did this actually happen?`,
     );
   }
   for (const c of contradicted) {
     qs.push(
-      `The AAR says "${c.claim}", but the trace shows otherwise — which account is correct?`,
+      `The AAR says "${c.claim}", but the trace shows otherwise, which account is correct?`,
     );
   }
   if (status === "insufficient_trace") {
     qs.push(
-      "The trace has no file-write/command/git_diff events to verify the AAR against — can you attach a fuller trace?",
+      "The trace has no file-write/command/git_diff events to verify the AAR against, can you attach a fuller trace?",
     );
   }
   return qs;

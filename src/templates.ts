@@ -4,8 +4,9 @@
 // when a section is left blank, so even a skipped section still instructs).
 //
 // The section set mirrors the real corpus the author writes against
-// (~280 aar-*.md files): the three load-bearing parts are the ask, what
-// changed, and — the signature move — what was deliberately NOT done.
+// (~280 aar-*.md files): the load-bearing parts are the ask, what changed, and
+// the decisions and follow-ups, the section that ages best because it records
+// which choices were deliberate and which gaps are already known.
 
 export type SectionSpec = {
   id: string;
@@ -25,19 +26,19 @@ const ASK: SectionSpec = {
   id: "asked",
   heading: "What was asked for",
   guidance:
-    "The request in the asker's own words. One or two sentences — what did they actually want?",
+    "The request in the asker's own words. One or two sentences: what did they actually want?",
 };
 
-const NEGATIVE_SPACE: SectionSpec = {
-  id: "not_done",
-  heading: "What I did NOT do",
+const DECISIONS: SectionSpec = {
+  id: "decisions",
+  heading: "Decisions and follow-ups",
   guidance:
-    "The honest part: things you deliberately did not change, follow-ups you're punting, known gaps. This is the highest-value section — it stops future-you (or the next person) from wondering whether you missed something or chose to skip it.",
+    "The part that ages well: deliberate choices, known gaps, deferred follow-ups.",
 };
 
-const VALIDATION: SectionSpec = {
+const VERIFIED: SectionSpec = {
   id: "validation",
-  heading: "Validation",
+  heading: "Verified",
   guidance:
     "How you know it works: tests you ran, what you checked by hand. \"Didn't verify X\" is a valid and useful answer.",
 };
@@ -46,7 +47,7 @@ export const TEMPLATES: Template[] = [
   {
     id: "generic",
     label: "Generic / minimal",
-    description: "The core sections only — a good default for any task.",
+    description: "The core sections only, a good default for any task.",
     sections: [
       ASK,
       {
@@ -55,14 +56,14 @@ export const TEMPLATES: Template[] = [
         guidance:
           "What you actually did. Name the files you touched with exact paths so it's findable later.",
       },
-      NEGATIVE_SPACE,
-      VALIDATION,
+      DECISIONS,
+      VERIFIED,
     ],
   },
   {
     id: "bugfix",
     label: "Bug fix",
-    description: "A fix: symptom, root cause, the change, validation.",
+    description: "A fix: symptom, root cause, the change, verification.",
     sections: [
       {
         id: "reported",
@@ -74,21 +75,21 @@ export const TEMPLATES: Template[] = [
         id: "root_cause",
         heading: "Root cause",
         guidance:
-          "What was actually wrong underneath — not the symptom, the cause. Name the file/function.",
+          "What was actually wrong underneath, not the symptom but the cause. Name the file/function.",
       },
       {
         id: "fix",
         heading: "The fix",
         guidance: "What you changed to address the root cause. Exact paths.",
       },
-      { ...NEGATIVE_SPACE, heading: "What I did NOT do / follow-ups" },
-      VALIDATION,
+      DECISIONS,
+      VERIFIED,
     ],
   },
   {
     id: "feature",
     label: "Feature / what was built",
-    description: "New work: what shipped, design decisions, validation.",
+    description: "New work: what shipped, design decisions, verification.",
     sections: [
       ASK,
       {
@@ -99,12 +100,11 @@ export const TEMPLATES: Template[] = [
       },
       {
         id: "design",
-        heading: "Design decisions / trade-offs",
+        heading: "Design decisions",
         guidance:
-          "Choices worth recording and why — what you considered and rejected. Future-you will ask \"why did I do it this way.\"",
+          "Choices worth recording and why: what you considered and rejected, and which gaps you left on purpose. Future-you will ask why you did it this way.",
       },
-      { ...NEGATIVE_SPACE, heading: "What I did NOT do / follow-ups" },
-      VALIDATION,
+      VERIFIED,
     ],
   },
   {
@@ -115,7 +115,7 @@ export const TEMPLATES: Template[] = [
       {
         id: "question",
         heading: "The question",
-        guidance: "What prompted this — the question you set out to answer.",
+        guidance: "What prompted this: the question you set out to answer.",
       },
       {
         id: "found",
@@ -130,8 +130,8 @@ export const TEMPLATES: Template[] = [
       },
       {
         id: "followups",
-        heading: "Recommended follow-ups (not done)",
-        guidance: "What should happen next that you did NOT do here.",
+        heading: "Recommended follow-ups",
+        guidance: "What should happen next, beyond what you did here.",
       },
       {
         id: "notes",

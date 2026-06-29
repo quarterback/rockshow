@@ -1,7 +1,7 @@
 import type { ClaimEntities } from "./types.js";
 
-// Deterministic entity extraction over claim text. These extracted anchors —
-// file paths, commands, function names, commit hashes, PR numbers, branches —
+// Deterministic entity extraction over claim text. These extracted anchors,
+// file paths, commands, function names, commit hashes, PR numbers, branches,
 // are what the matcher keys on, so this is the highest-value part of the parser.
 // Each extractor is small and independently testable.
 

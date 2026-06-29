@@ -10,7 +10,7 @@ import { GUIDE } from "./guide.js";
 //   closedtab guide
 //   closedtab reconcile --testimony <file.md> --trace <file.jsonl|json> [--out <diff.json>]
 //
-// Authoring (`new`) is the front door — write AARs the way you'd want to read
+// Authoring (`new`) is the front door: write AARs the way you'd want to read
 // them. `reconcile` is the advanced step: once you have an AAR and a record of
 // what actually happened, check one against the other.
 
@@ -37,7 +37,7 @@ function parseArgs(argv: string[]): { command: string; args: Args } {
   return { command, args };
 }
 
-const USAGE = `closedtab — write After-Action Reports (and, later, check them)  (alias: oi)
+const USAGE = `closedtab: write After-Action Reports (and, later, check them)  (alias: oi)
 
 Usage:
   closedtab new [title] [--type bugfix|feature|investigation|generic] [--dir docs]
@@ -86,7 +86,7 @@ function reconcileCommand(args: Args): number {
   const json = JSON.stringify(diff, null, 2);
   if (typeof args.out === "string") {
     writeFileSync(args.out, json + "\n", "utf8");
-    console.error(`closedtab: ${diff.status} — wrote ${args.out}`);
+    console.error(`closedtab: ${diff.status}, wrote ${args.out}`);
   } else {
     console.log(json);
   }

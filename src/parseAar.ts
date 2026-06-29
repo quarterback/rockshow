@@ -63,7 +63,7 @@ function cleanLine(line: string): string {
 }
 
 // AAR front-matter lines ("**Branch:** ...", "PR: #73", "Commit: `abc`") are
-// metadata, not claims — drop them so labels like "Commit:" aren't read as the
+// metadata, not claims, drop them so labels like "Commit:" aren't read as the
 // verb "commit".
 const METADATA_LINE_RE =
   /^(date(?:\s+completed)?|branch(?:\s+name)?|prs?|commit|commits|author|status|repo|completed)\b\s*[:：]/i;
@@ -111,7 +111,7 @@ function toBlocks(body: string): string[] {
 const SENTENCE_SPLIT_RE = /(?<=[.!?])\s+(?=[A-Z(`"])/;
 
 // Coordinating-conjunction split. "edited app.py and ran the suite" -> two
-// claims. v0 heuristic — LLM-assisted extraction plugs in here.
+// claims. v0 heuristic: LLM-assisted extraction plugs in here.
 const CONJUNCTION_SPLIT_RE = /(?:;\s+|,\s+and\s+|,\s+then\s+|\s+and\s+|\s+then\s+)/;
 
 function splitIntoClaims(body: string): string[] {
@@ -124,7 +124,7 @@ function splitIntoClaims(body: string): string[] {
     for (const sentence of line.split(SENTENCE_SPLIT_RE)) {
       const s = sentence.trim();
       if (!s) continue;
-      // v0 heuristic — LLM-assisted extraction plugs in here.
+      // v0 heuristic: LLM-assisted extraction plugs in here.
       for (const clause of s.split(CONJUNCTION_SPLIT_RE)) {
         const c = clause.trim().replace(/[.;,]+$/, "").trim();
         if (c.length >= 3) claims.push(c);

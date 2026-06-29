@@ -6,7 +6,7 @@ import { reconcileText } from "./index.js";
 
 // MCP stdio server. Exposes a single `reconcile` tool that is the same core the
 // CLI and library call. Load an AAR + trace, get the reconciliation diff back in
-// one call — the headline surface for the agent/MCP crowd.
+// one call, the headline surface for the agent/MCP crowd.
 
 const server = new McpServer({
   name: "closedtab",

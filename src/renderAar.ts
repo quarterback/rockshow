@@ -56,7 +56,7 @@ function renderSection(section: SectionSpec, answer: string | undefined): string
  * authored non-interactively.
  */
 export function renderAar(template: Template, meta: AarMeta, answers: Answers): string {
-  const header = `# AAR — ${meta.title.trim()}\n\n${metaLine(meta)}\n`;
+  const header = `# AAR: ${meta.title.trim()}\n\n${metaLine(meta)}\n`;
   const body = template.sections
     .map((s) => renderSection(s, answers[s.id]))
     .join("\n");
