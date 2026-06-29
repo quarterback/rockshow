@@ -1,7 +1,9 @@
 import type { Template, SectionSpec } from "./templates.js";
 
-// Pure rendering of an AAR markdown file from a template + collected answers.
-// Kept separate from the interactive prompt flow so it is trivially testable.
+// Pure rendering of a doc from a template + collected answers. Two shapes:
+// the Agent Action Record (a labeled header block + sections of labeled fields),
+// and the lighter task docs (an inline meta line + prose sections). Kept
+// separate from the interactive flow so it is trivially testable.
 
 export type AarMeta = {
   title: string;
@@ -11,7 +13,7 @@ export type AarMeta = {
   commit?: string;
 };
 
-// answers: section id -> the author's text (may be empty/skipped)
+// answers: section id (prose) or field id (fielded) -> the author's text
 export type Answers = Record<string, string>;
 
 /** Turn a title into a stable file slug, e.g. "Fix pitcher W/L" -> "fix-pitcher-w-l". */
@@ -40,30 +42,58 @@ function normalizePr(pr: string): string {
   return /^#/.test(t) ? t : `#${t.replace(/^#/, "")}`;
 }
 
-function metaLine(meta: AarMeta): string {
-  const parts = [`**Date:** ${meta.date}`];
-  if (meta.branch?.trim()) parts.push(`**Branch:** \`${meta.branch.trim()}\``);
-  if (meta.pr?.trim()) parts.push(`**PR:** ${normalizePr(meta.pr)}`);
-  if (meta.commit?.trim()) parts.push(`**Commit:** \`${meta.commit.trim()}\``);
-  return parts.join(" · ");
+function extraMetaLines(meta: AarMeta): string[] {
+  const lines: string[] = [];
+  if (meta.branch?.trim()) lines.push(`**Branch:** \`${meta.branch.trim()}\``);
+  if (meta.pr?.trim()) lines.push(`**PR:** ${normalizePr(meta.pr)}`);
+  if (meta.commit?.trim()) lines.push(`**Commit:** \`${meta.commit.trim()}\``);
+  return lines;
 }
 
-function renderSection(section: SectionSpec, answer: string | undefined): string {
+function header(template: Template, meta: AarMeta): string {
+  const title = meta.title.trim();
+  if (template.metaFields) {
+    // Labeled header block (the Agent Action Record).
+    const lines = template.metaFields.map((f) => {
+      const v = f.auto === "date" ? meta.date : f.auto === "title" ? title : "";
+      return `**${f.label}:** ${v}`.trimEnd();
+    });
+    lines.push(...extraMetaLines(meta));
+    return `# ${template.docLabel}: ${title}\n\n${lines.join("\n")}\n\n---\n`;
+  }
+  // Inline meta line (task docs).
+  const meta1 = [`**Date:** ${meta.date}`, ...extraMetaLines(meta)].join(" · ");
+  return `# ${template.docLabel}: ${title}\n\n${meta1}\n`;
+}
+
+function renderProseSection(section: SectionSpec, answer: string | undefined): string {
   const body = (answer ?? "").trim();
   // A skipped section still teaches: the guidance is left as an HTML comment.
   const content = body !== "" ? body : `<!-- ${section.guidance} -->`;
   return `## ${section.heading}\n\n${content}\n`;
 }
 
+function renderFieldedSection(section: SectionSpec, answers: Answers): string {
+  const parts = (section.fields ?? []).map((f) => {
+    const ans = (answers[f.id] ?? "").trim();
+    if (ans !== "") return `**${f.label}:**\n\n${ans}\n`;
+    return f.hint ? `**${f.label}:**\n<!-- ${f.hint} -->\n` : `**${f.label}:**\n`;
+  });
+  return `## ${section.heading}\n\n${parts.join("\n")}`;
+}
+
 /**
- * Render a complete AAR markdown document. Sections with no answer are written
- * with their guidance as a comment, so the file is a usable scaffold even when
- * authored non-interactively.
+ * Render a complete doc. Fielded sections (the record) render as a labeled form;
+ * prose sections render with their guidance as an HTML comment when skipped, so
+ * the file is a usable scaffold even when authored non-interactively.
  */
 export function renderAar(template: Template, meta: AarMeta, answers: Answers): string {
-  const header = `# ${template.docLabel}: ${meta.title.trim()}\n\n${metaLine(meta)}\n`;
   const body = template.sections
-    .map((s) => renderSection(s, answers[s.id]))
+    .map((s) =>
+      s.fields && s.fields.length > 0
+        ? renderFieldedSection(s, answers)
+        : renderProseSection(s, answers[s.id]),
+    )
     .join("\n");
-  return `${header}\n${body}`;
+  return `${header(template, meta)}\n${body}`;
 }

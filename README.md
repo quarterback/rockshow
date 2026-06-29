@@ -1,130 +1,92 @@
-# closedtab: docs for human-agent teams
+# closedtab: review the work your AI agents do
 
-When a person and one or more AI agents do work across a sprint, the work needs
-a memory: what was asked, what the agent did, what got decided and by whom, what
-was deliberately left, and where the next agent should pick up. closedtab writes
-those docs and keeps them in a shape the whole team (future agents and past ones)
-can follow. Write one for every useful segment of work: a bug fix, a feature, a
-tuning pass, a decision, an end-of-session handoff. Many people do it every PR.
+An AI agent finishes a task. closedtab helps you review what it did and keep a
+record. The record is a short, comparable artifact built around one idea:
+outputs are easy to measure, judgment is hard. It surfaces the decisions the
+agent made on its own, the moments a human should have been in the loop, the
+places it was confidently wrong, and what that cost or risked.
 
-The name is the idea: closing the tab on a segment of work means writing down
-what happened, so the next tab can open where this one left off.
+It works best when you stay hands-on: you as the product owner, agents as
+engineer or PM. Run it feature by feature, on the work you are steering. Read the
+records across many runs, where patterns in the Deviation and Change sections
+tell you more than any single review.
 
 ```
 npm install -g closedtab
 ```
 
-## Start here: write one
+## The Agent Action Record
 
 ```
 closedtab new
 ```
 
-It picks a template, asks you a few questions, and writes a dated, prefixed file
-(`aar-<slug>.md`, `adr-<slug>.md`, `handoff-<slug>.md`, ...):
+It scaffolds a dated **Agent Action Record** to fill in: a six-part review of one
+agent run.
 
-```markdown
-# AAR: fix pitcher W/L
-**Date:** 2026-06-29 · **Branch:** `claude/fix-wl` · **Commit:** `b1787ef`
+| Part | What it captures |
+|---|---|
+| **Intent** | the instruction, how success was defined, the authority the agent had, what was out of scope |
+| **Action** | what it did (from logs), what it produced, where it diverged, whether it stayed within authority |
+| **Judgment** | the decisions it made alone, which a human should have seen, where it should have escalated, who is accountable |
+| **Deviation** | the gaps and their root cause, the good deviations, the confidently-wrong |
+| **Consequence** | the outcome, the harm or cost or risk, who was affected, the expected failure at 100 runs |
+| **Change** | what changes before the next run, what to keep, what belongs with a human, the signal it worked |
 
-## What was reported
-Every pitcher rendered with a (W) or (L) in the box score.
+The `record-template.md` in this repo is the same form by hand: work through the
+six sections in order, no AI required, and keep the record.
 
-## Root cause
-`_aggregate_pitcher_rows` copied season W/L totals onto each per-game row.
-
-## The fix
-Read the per-game decision in `o27v2/web/app.py` instead of the season map.
-
-## Decisions and follow-ups
-<!-- Deliberate choices, who made them (owner/agent/joint), and gaps left on purpose. -->
-
-## Verified
-Ran `pytest o27v2/tests`; box score now shows one (W) and one (L).
-```
-
-Skip any section you have nothing for; a skipped section keeps its guidance as a
-comment, so the file still teaches what goes there. It auto-fills the branch and
-commit from git when you are in a repo.
-
-## Why bother
+## Score a record
 
 ```
-closedtab guide      # the practice, and why it pays off for a human-agent team
+closedtab check ./docs/aar-fall-portal.md
 ```
 
-The short version: across a stack of human-agent sprints, the doc is the shared
-memory. The section that ages best is decisions and follow-ups: it records which
-choices were deliberate, who made them, and which gaps are known, so the next
-agent builds on the work instead of relitigating it. The "for the next agent"
-section is the breadcrumb trail: open hooks, gotchas, what not to touch. Keep a
-`docs/` folder of these and the project carries its own history.
+Scores a record on whether it surfaced the things that matter: the intent, the
+reasoning, who decided, how it held up, the deviations, and the risks carried
+forward.
 
-## Templates
-
-`closedtab new` ships seven shapes (pick at the prompt, or pass `--type`). The
-first four are AARs; the rest are the other docs a human-agent team leaves.
-
-| Type | For | Writes |
-|---|---|---|
-| `generic` | any segment of work (default) | `aar-*.md` |
-| `bugfix` | a fix: reported, root cause, fix, decisions, verified | `aar-*.md` |
-| `feature` | new work: built, design decisions, verified, next agent | `aar-*.md` |
-| `investigation` | a look into something: findings, verdicts, follow-ups | `aar-*.md` |
-| `adr` | a design/architecture decision: context, decision, alternatives, decided-by | `adr-*.md` |
-| `handoff` | end-of-sprint state transfer: current state, what's open, what not to touch | `handoff-*.md` |
-| `proposal` | a forward-looking feature request: what, why, scope, open questions | `proposal-*.md` |
-
-## Check a doc
-
-```
-closedtab check ./docs/aar-fix-pitcher-wl.md
-```
-
-Scores a doc on whether it left the breadcrumbs a human-agent team needs: a
-scope/ask, a rationale, a delegation record (who decided), validation, negative
-space (what wasn't done), and residual risks. It's a nudge, not a gate.
-
-## Reconcile
+## Reconcile against a trace
 
 ```
 closedtab reconcile --testimony ./aar.md --trace ./trace.jsonl --out ./diff.json
 ```
 
-Once you have a doc and a record of what the agent actually did, reconcile checks
-the claims against the run: where they agree, where the doc claims more than the
-trace shows, where the trace shows work the doc omitted, and any direct
-contradictions. Done vs. requested vs. left, made checkable.
+Lines a record up against a machine trace of what the agent actually did. Intent
+and Action go in; the Deviation falls out: where they agree, where the record
+claims more than the trace shows, where the trace shows work the record omits,
+and any direct contradiction.
 
-## Library and MCP
+## Task docs too
 
-Everything is a thin wrapper over a pure core.
+`closedtab new --type bugfix` (also `feature`, `adr`, `handoff`) writes lighter
+task docs for the same human-agent team, each to its own prefix (`aar-*`,
+`adr-*`, `handoff-*`). The Agent Action Record is the default and the point.
+
+## Let the agent review its own run (MCP)
+
+```json
+{ "mcpServers": { "closedtab": { "command": "closedtab-mcp" } } }
+```
+
+That gives the agent four tools: `list_templates`, `new_doc`, `check`, and
+`reconcile`. The agent finishes a segment, writes the record of what it just did,
+checks it, and saves it alongside the change.
+
+## Library
 
 ```javascript
 import { renderAar, TEMPLATES, checkDoc, reconcileText } from "closedtab";
 ```
 
-Published unscoped (`npm i closedtab`).
+## Publish and develop
 
 ```
-npm login
-npm publish        # runs prepublishOnly: clean, build, test, then ships dist/
-```
-
-Later releases: `npm version patch`, push the tag, and a GitHub Action publishes
-via trusted publishing (OIDC), no token needed (`.github/workflows/publish.yml`).
-
-## Develop
-
-```
-npm install
+npm publish             # runs prepublishOnly: clean, build, test, ships dist/
 npm test                # vitest
 npm run build           # tsc to dist/
-npm run corpus-report   # heading-frequency report over a local doc corpus
 ```
 
-Local and deterministic: no network, no API key. The reconcile matcher is plain
-TS with a marked seam (`// v0 heuristic: LLM-assisted extraction plugs in later`)
-for an optional LLM mode later.
-
-More on the philosophy in `WHY.md`.
+Local and deterministic: it needs only Node. The record format comes from the
+Agent After-Action Review skill (github.com/quarterback/AAR), here under MIT.
+More on the thinking in `WHY.md`.

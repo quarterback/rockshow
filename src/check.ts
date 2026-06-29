@@ -32,8 +32,14 @@ function sections(markdown: string): DocSection[] {
   let body: string[] = [];
   let inFence = false;
   const flush = () => {
-    // Strip HTML comments (skipped-section guidance) before measuring content.
-    const text = body.join("\n").replace(/<!--[\s\S]*?-->/g, "").trim();
+    // Strip HTML comments (skipped guidance) and blank field labels (e.g.
+    // "**Authority granted:**" with nothing after) before measuring content, so
+    // a blank record form reads as empty rather than full.
+    const text = body
+      .join("\n")
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .replace(/^\s*\*\*[^*\n]+:\*\*\s*$/gm, "")
+      .trim();
     out.push({ heading, body: text });
     body = [];
   };
@@ -61,16 +67,17 @@ function sections(markdown: string): DocSection[] {
 // generous nudge: better to over-credit a real doc than score a good one 1/6.
 const HEADING_PATTERNS: Record<QualityDimension, RegExp> = {
   scope:
-    /\b(what was asked|the ask|the brief|asked for|scope|objective|mission|context|the request|requested|reported|problem|the question|what we want|one-liner|summary|what the (user|owner))\b/i,
+    /\b(intent|supposed to happen|what was asked|the ask|the brief|asked for|scope|objective|mission|context|the request|requested|reported|problem|the question|what we want|one-liner|summary|what the (user|owner))\b/i,
   rationale:
-    /\b(why|rationale|root cause|design decision|design rationale|the intent|reason|decision|consequences|trade-?off|the fix|diagnosis|the problem)\b/i,
-  delegation: /\b(decided by|delegation|decisions and follow-?ups|design decisions|key decisions|decision record|owner spec)\b/i,
+    /\b(why|rationale|root cause|deviation|judgment|design decision|design rationale|the intent|reason|decision|consequences|trade-?off|the fix|diagnosis|the problem)\b/i,
+  delegation:
+    /\b(judgment|human in the loop|escalat|accountable|decided by|delegation|decisions and follow-?ups|design decisions|key decisions|decision record|owner spec)\b/i,
   validation:
-    /\b(verified|validation|verification|testing|tests|how (i|we) know|smoke|results|what got verified)\b/i,
+    /\b(verified|validation|verification|testing|tests|consequence|outcome|hold up|how (i|we) know|smoke|results|what got verified)\b/i,
   negative_space:
-    /\b(not done|not changed|not touched|follow-?ups?|out of scope|deferred|what not to touch|deliberately|left (out|alone)|did not|caveats?|known (gaps|issues|limitations))\b/i,
+    /\b(deviation|change\b|gaps?|not done|not changed|not touched|follow-?ups?|out of scope|deferred|what not to touch|deliberately|left (out|alone)|did not|caveats?|known (gaps|issues|limitations))\b/i,
   residual_risk:
-    /\b(residual risk|risks?|what to watch|known (gaps|issues|limitations)|tech(nical)? debt|open questions?|gotchas?|fragile|honest (gaps|caveats)|still (open|broken))\b/i,
+    /\b(consequence|residual risk|risks?|cost|harm|what to watch|known (gaps|issues|limitations)|tech(nical)? debt|open questions?|gotchas?|fragile|honest (gaps|caveats)|still (open|broken))\b/i,
 };
 
 // Signal phrases scanned across the whole body (header-agnostic detection).

@@ -1,135 +1,74 @@
-# closedtab: a shared memory for you and your AI agents
+# closedtab: review the work your AI agents do
 
-You and your AI agents ship a lot of work. A bug fix here, a feature there, a
-design decision, a tuning pass, a handoff at the end of a long session. Each one
-is a small story worth keeping. closedtab helps you write that story down in
-about two minutes, so the whole team carries the same memory forward.
+An AI agent finishes a task. It made a string of small calls along the way: where
+to start, what to assume, when to act on its own. closedtab helps you review that
+run and keep a record of it, in about two minutes.
 
-The name says the idea: when you close the tab on a piece of work, you leave a
-note, and the next tab opens right where this one ended.
+The idea behind it is simple: outputs are easy to measure, and judgment is hard.
+A test suite tells you the code passes. It stays quiet about the moment the agent
+decided something on its own that you would have wanted to see. closedtab puts
+those moments on the page.
 
 ## Why it exists
 
-Agents move fast and work across many sessions. You set a direction, an agent
-builds a piece, another agent picks up the next piece, and weeks later someone
-reopens the project to add more. Everyone in that chain reads better when there
-is a short record of what happened: what you asked for, what the agent built,
-which calls were deliberate and who made them, how it was checked, and what the
-next agent should know.
+Agents now make decisions, take actions, and finish tasks that carry real weight.
+After-action reviews are a long-standing practice for exactly this: in the
+military and in emergency response, you debrief after the fact, reconstruct what
+happened, and surface what to change. closedtab brings that practice to agent
+work, and gives the review a fixed shape so the records stay comparable run to
+run.
 
-That record is the point. Write it once, and future-you, the next agent, and the
-agent re-reading it three sprints later all share the same trail. closedtab gives
-the record a consistent shape so it stays quick to write and easy to read.
+It earns the most when you stay hands-on. Picture yourself as the product owner,
+with one agent as engineer and another as PM. There, a record of each run keeps
+everyone oriented and keeps the decisions visible. Run it feature by feature, on
+the work you are steering, and the records add up into a real history.
 
-Two parts of each doc earn their keep:
+## The six-part review
 
-- **Decisions and follow-ups** holds the choices you made on purpose, who made
-  them (you, the agent, or both together), and the gaps you already know about.
-  This is the part a future agent reads first.
-- **For the next agent** holds the breadcrumbs: the open hooks left in the code,
-  the gotchas learned along the way, the parts to keep stable, and any question
-  that needs your call.
+`closedtab new` scaffolds an **Agent Action Record**: six sections you work
+through in order.
 
-## What you'd use it for
+1. **Intent** — the instruction in its actual wording, how success was defined,
+   the authority the agent had to act on its own, and what stayed out of scope.
+2. **Action** — what the agent did (from logs where you have them), what it
+   produced, where its behavior diverged, and whether it stayed within authority.
+3. **Judgment** — the decisions the agent made alone, which of those a human
+   should have made or seen, where a human stepped in, where it should have
+   escalated, and who is accountable. This is the heart of it.
+4. **Deviation** — the gaps between intent and action and their root cause, the
+   good deviations (correct departures from a flawed instruction), and the places
+   it was confidently wrong.
+5. **Consequence** — the outcome, the cost or risk, who was affected downstream,
+   and the failure you would expect if this run happened a hundred times.
+6. **Change** — what changes before the next run, what to keep doing, what belongs
+   with a human, and the signal that proves the change worked.
 
-Write one for any segment of work the team will want to remember:
-
-- A **bug fix**: what was reported, the root cause, the fix, how you verified it.
-- A **feature** you built: what shipped, the design decisions, what comes next.
-- A **decision** worth recording (an ADR): the context, the decision, the
-  alternatives you weighed, and who made the call.
-- An **end-of-sprint handoff**: the current state, where to pick up, the parts to
-  keep stable, and the open questions for you.
-- A **proposal** for new work: what you want, why, the scope, the open questions.
-
-Many teams write one per pull request. Over time you get a `docs/` folder of small
-docs that together tell the whole history of the project.
+Read across many records, the Deviation and Change sections are where the value
+compounds: they show you the patterns in how a given agent works.
 
 ## How to use it: the command line
 
-Install it once:
-
 ```
 npm install -g closedtab
+closedtab new        # scaffold an Agent Action Record to fill in
+closedtab guide      # the short how-to
+closedtab check ./docs/aar-fall-portal.md     # score a record on what it surfaced
+closedtab reconcile --testimony ./aar.md --trace ./trace.jsonl   # line it up with the run
 ```
 
-Write a doc by answering a few questions:
+`closedtab reconcile` takes the record plus a trace of what the agent actually
+did, and reports four things: the claims the run confirms, the claims that still
+want evidence, the actions in the run worth adding to the record, and any place
+where the record and the run tell different stories. It runs locally and needs
+only Node.
 
-```
-closedtab new
-```
+The `record-template.md` is a plain form too. Work the six sections by hand, keep
+the record, and read them over time. Claude stays optional.
 
-It picks a template, asks you a handful of questions, fills in the date, branch,
-and commit from git, and writes a dated file like `aar-fix-pitcher-wl.md`. Fill
-the sections you have; leave the rest for later, and the guidance stays in the
-file to help you finish it. A completed one reads like this:
+## How to use it: MCP
 
-```markdown
-# AAR: fix pitcher W/L
-
-**Date:** 2026-06-29 · **Branch:** `claude/fix-wl` · **Commit:** `b1787ef`
-
-## What was reported
-Every pitcher rendered with a (W) or (L) in the box score.
-
-## Root cause
-`_aggregate_pitcher_rows` copied season W/L totals onto each per-game row.
-
-## The fix
-Read the per-game decision in `o27v2/web/app.py`.
-
-## Decisions and follow-ups
-Owner-directed: keep the season map. I inferred the display fix; flagged for you
-to sanity-check. Follow-up: the seconds column, left for a later pass.
-
-## Verified
-Ran `pytest o27v2/tests`; the box score shows one (W) and one (L).
-```
-
-Read the short guide any time:
-
-```
-closedtab guide
-```
-
-Score a doc to see how complete it is. closedtab looks for six things a
-human-agent team relies on: the scope, the why, who decided, how it was verified,
-the follow-ups, and the known risks:
-
-```
-closedtab check ./docs/aar-fix-pitcher-wl.md
-```
-
-```
-score: 5/6
-
-  ✓ scope / the ask
-  ✓ rationale (the why)
-  ✓ delegation record (who decided)
-  ✓ validation
-  ✓ follow-ups and known gaps
-  ✗ residual risks
-
-to strengthen it:
-  - Name the known gaps, risks, or open questions carried forward.
-```
-
-And once you have a doc plus a record of what the agent actually did, line them
-up:
-
-```
-closedtab reconcile --testimony ./aar.md --trace ./trace.jsonl
-```
-
-reconcile reports four things: the claims the run confirms, the claims that still
-want evidence, the actions in the run that are worth adding to the doc, and any
-place where the doc and the run tell different stories. It runs locally and reads
-plainly; it needs only Node.
-
-## How to use it: MCP (let the agent write its own docs)
-
-closedtab also runs as an MCP server, so an agent can write and score its own docs
-as part of doing the work. Point your MCP client at it:
+closedtab also runs as an MCP server, so an agent can write the record of its own
+run as part of finishing the work:
 
 ```json
 {
@@ -141,27 +80,20 @@ as part of doing the work. Point your MCP client at it:
 }
 ```
 
-That gives the agent four tools:
-
-- `list_templates` returns the templates and the sections each one asks for, so
-  the agent learns the shape.
-- `new_doc` takes a template, a title, and a map of section content, and returns
-  the finished markdown plus the filename to save it to.
-- `check` takes the markdown and returns the score and the suggestions.
-- `reconcile` takes the doc and a run trace and returns where they line up.
-
-A typical loop: the agent finishes a segment of work, calls `new_doc` to write the
-AAR with everything it just did, calls `check` to confirm it left the right
-breadcrumbs, and saves the file alongside the change. The human reads a clean,
-consistent record, and the next agent inherits it.
+The agent gets four tools — `list_templates`, `new_doc`, `check`, `reconcile`. A
+typical loop: the agent finishes a segment, calls `new_doc` to write the record
+of what it just did, calls `check` to confirm it surfaced the judgment and the
+deviations, and saves the file with the change. You read a clean, consistent
+record, and the next agent inherits it.
 
 ## Start tonight
 
-Pick the last thing you shipped and write one doc about it:
+Pick the last run an agent did for you and review it:
 
 ```
 npm install -g closedtab
 closedtab new
 ```
 
-Two minutes, and the next tab opens where this one ended.
+Two minutes, and you have a record of what the agent decided, where you would have
+wanted to be in the loop, and what to change before the next run.

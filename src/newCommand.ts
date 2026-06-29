@@ -4,7 +4,7 @@ import { execSync } from "node:child_process";
 import * as readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
 import type { Readable, Writable } from "node:stream";
-import { TEMPLATES, getTemplate, type Template } from "./templates.js";
+import { TEMPLATES, getTemplate, isFielded, type Template } from "./templates.js";
 import {
   renderAar,
   docFilename,
@@ -122,12 +122,17 @@ export async function runNew(
   const out = io.output ?? stdout;
   const rl = readline.createInterface({ input, output: out });
   try {
-    out.write("closedtab: a new doc for a human-agent team\n");
+    out.write("closedtab: review an agent run (or write a task doc)\n");
 
     const template = await chooseTemplate(rl, out, opts.type);
 
-    let title = opts.title?.trim() ?? "";
-    while (!title) title = (await rl.question("\nTitle: ")).trim();
+    let title =
+      opts.title?.trim() ??
+      "";
+    while (!title) {
+      const prompt = isFielded(template) ? "\nTask or period under review: " : "\nTitle: ";
+      title = (await rl.question(prompt)).trim();
+    }
 
     out.write("\nOptional context (press Enter to skip any):\n");
     const branch = await ask(rl, "  Branch", gitValue("rev-parse --abbrev-ref HEAD"));
@@ -135,13 +140,21 @@ export async function runNew(
     const commit = await ask(rl, "  Commit", gitValue("rev-parse --short HEAD"));
 
     const meta: AarMeta = { title, date: todayIso(), branch, pr, commit };
-
-    out.write(
-      `\nNow the sections. Skip any you don't have yet, a skipped section keeps its guidance as a comment so you can fill it in later.\n`,
-    );
     const answers: Answers = {};
-    for (const section of template.sections) {
-      answers[section.id] = await readSection(rl, out, section.heading, section.guidance);
+
+    if (isFielded(template)) {
+      // The record is a form you fill by hand (no AI required). Scaffold it
+      // blank, with every field labeled, and let the reviewer work through it.
+      out.write(
+        `\nScaffolding a blank ${template.docLabel}. Work through the six sections in order; the field labels and hints are in the file.\n`,
+      );
+    } else {
+      out.write(
+        `\nNow the sections. Skip any you don't have yet; a skipped section keeps its guidance as a comment so you can fill it in later.\n`,
+      );
+      for (const section of template.sections) {
+        answers[section.id] = await readSection(rl, out, section.heading, section.guidance);
+      }
     }
 
     const dir = resolveDir(opts.dir);
@@ -149,7 +162,7 @@ export async function runNew(
     writeFileSync(path, renderAar(template, meta, answers), "utf8");
 
     out.write(`\n✓ Wrote ${path}\n`);
-    out.write(`  Open it, flesh out anything you skipped, and commit it alongside your work.\n`);
+    out.write(`  Open it, fill it in, and keep it alongside the work. Read records across runs: the Deviation and Change sections tell you the most over time.\n`);
     return path;
   } finally {
     rl.close();

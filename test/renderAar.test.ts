@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderAar, slugify, aarFilename } from "../src/renderAar.js";
-import { TEMPLATES, getTemplate } from "../src/templates.js";
+import { TEMPLATES, getTemplate, isFielded } from "../src/templates.js";
 import { parseAarTestimony } from "../src/parseAar.js";
 
 describe("slugify", () => {
@@ -19,35 +19,40 @@ describe("slugify", () => {
 });
 
 describe("templates", () => {
-  it("ships the expected templates with doc labels and file prefixes", () => {
-    expect(TEMPLATES.map((t) => t.id).sort()).toEqual([
-      "adr",
+  it("ships the Agent Action Record as the flagship plus task variants", () => {
+    expect(TEMPLATES.map((t) => t.id)).toEqual([
+      "record",
       "bugfix",
       "feature",
-      "generic",
+      "adr",
       "handoff",
-      "investigation",
-      "proposal",
     ]);
+    // The record is first (the default) and renders as a labeled form.
+    expect(TEMPLATES[0].id).toBe("record");
+    expect(getTemplate("record")!.docLabel).toBe("Agent Action Record");
+    expect(isFielded(getTemplate("record")!)).toBe(true);
     // Doc type drives the title label and the filename prefix.
     expect(getTemplate("adr")!.docLabel).toBe("ADR");
-    expect(getTemplate("adr")!.filePrefix).toBe("adr");
     expect(getTemplate("handoff")!.filePrefix).toBe("handoff");
-    expect(getTemplate("generic")!.docLabel).toBe("AAR");
   });
-  it("every AAR template prompts for decisions / design / follow-ups", () => {
-    // The section that ages best: deliberate choices and known gaps.
-    for (const t of TEMPLATES.filter((t) => t.filePrefix === "aar")) {
-      const hasDecisions = t.sections.some((s) =>
-        /decision|follow-?up|recommend/i.test(s.heading),
-      );
-      expect(hasDecisions, `${t.id} should prompt for decisions/follow-ups`).toBe(true);
-    }
+
+  it("the record has the canonical six sections in order", () => {
+    expect(getTemplate("record")!.sections.map((s) => s.id)).toEqual([
+      "intent",
+      "action",
+      "judgment",
+      "deviation",
+      "consequence",
+      "change",
+    ]);
   });
-  it("AAR templates carry a 'for the next agent' breadcrumb section where it fits", () => {
-    // generic and feature explicitly leave breadcrumbs for the next agent.
-    expect(getTemplate("generic")!.sections.some((s) => s.id === "next_agent")).toBe(true);
-    expect(getTemplate("feature")!.sections.some((s) => s.id === "next_agent")).toBe(true);
+
+  it("the Judgment section asks who decided and where a human was in the loop", () => {
+    const judgment = getTemplate("record")!.sections.find((s) => s.id === "judgment")!;
+    const fieldIds = (judgment.fields ?? []).map((f) => f.id);
+    expect(fieldIds).toContain("decided_alone");
+    expect(fieldIds).toContain("should_have_escalated");
+    expect(fieldIds).toContain("accountable");
   });
 });
 
@@ -86,7 +91,7 @@ describe("renderAar", () => {
   });
 
   it("omits optional meta fields that are blank", () => {
-    const md = renderAar(getTemplate("generic")!, { title: "x", date: "2026-06-29" }, {});
+    const md = renderAar(getTemplate("bugfix")!, { title: "x", date: "2026-06-29" }, {});
     expect(md).toContain("**Date:** 2026-06-29");
     expect(md).not.toContain("**Branch:**");
     expect(md).not.toContain("**PR:**");
@@ -94,9 +99,9 @@ describe("renderAar", () => {
 
   it("produces an AAR the closedtab parser can read back", () => {
     // The authored file should round-trip: its anchor sections parse as anchors.
-    const md = renderAar(getTemplate("generic")!, { title: "round trip", date: "2026-06-29" }, {
-      asked: "Add a pitch-count column.",
-      changed: "Edited `o27v2/web/box_text.py`.",
+    const md = renderAar(getTemplate("bugfix")!, { title: "round trip", date: "2026-06-29" }, {
+      reported: "The user reported a broken W/L column.",
+      fix: "Edited `o27v2/web/box_text.py`.",
       decisions: "Left `o27v2/web/templates/box.html` alone; follow-ups: none.",
       validation: "Ran `pytest o27v2/tests`.",
     });
@@ -104,5 +109,28 @@ describe("renderAar", () => {
     expect(claims.some((c) => c.section === "intent")).toBe(true);
     expect(claims.some((c) => c.section === "claimed_actions")).toBe(true);
     expect(claims.some((c) => c.section === "negative_space")).toBe(true);
+  });
+});
+
+describe("Agent Action Record rendering", () => {
+  const record = getTemplate("record")!;
+
+  it("renders the labeled header block and the field form", () => {
+    const md = renderAar(record, { title: "fall portal", date: "2026-06-29" }, {});
+    expect(md).toContain("# Agent Action Record: fall portal");
+    expect(md).toContain("**Review date:** 2026-06-29");
+    expect(md).toContain("**Task or period under review:** fall portal");
+    expect(md).toContain("**Accountable human (name or role):**");
+    // Field labels render even when blank, as a form to fill.
+    expect(md).toContain("**Instruction given (actual wording):**");
+    expect(md).toContain("**Points where it should have escalated and didn't:**");
+  });
+
+  it("fills a field with author text and keeps blanks as form fields", () => {
+    const md = renderAar(record, { title: "x", date: "2026-06-29" }, {
+      instruction: "Build the fall transfer portal.",
+    });
+    expect(md).toContain("**Instruction given (actual wording):**\n\nBuild the fall transfer portal.");
+    expect(md).toContain("**Out of scope:**"); // still present, blank
   });
 });

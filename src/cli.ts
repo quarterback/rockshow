@@ -39,20 +39,22 @@ function parseArgs(argv: string[]): { command: string; args: Args } {
   return { command, args };
 }
 
-const USAGE = `closedtab: docs for human-agent teams  (alias: oi)
+const USAGE = `closedtab: review the work your AI agents do  (alias: oi)
 
 Usage:
-  closedtab new [title] [--type generic|bugfix|feature|investigation|adr|handoff|proposal] [--dir docs]
-      Walk through a new doc question by question; write a dated, prefixed file.
+  closedtab new [title] [--type record|bugfix|feature|adr|handoff] [--dir docs]
+      Scaffold an Agent Action Record (the default) to fill in, or a task doc.
+      The record runs the six-part review: Intent, Action, Judgment, Deviation,
+      Consequence, Change.
 
   closedtab guide
-      Print a short how-to on writing these docs and why they pay off.
+      Print a short how-to on the review and why it pays off.
 
   closedtab check <file.md>
-      Score a doc on the breadcrumbs a human-agent team needs.
+      Score a record on whether it surfaced the things that matter.
 
   closedtab reconcile --testimony <file.md> --trace <file.jsonl|file.json> [--out <diff.json>]
-      Check a doc's claims against a machine trace of what actually happened.
+      Line a record up against a machine trace of what the agent actually did.
 
   -h, --help    Show this help.`;
 

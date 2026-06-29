@@ -1,59 +1,52 @@
-// The "how to write these docs" explainer, printed by `closedtab guide`.
-// Teaches the practice for human-agent teams, not just the format.
+// The guide printed by `closedtab guide`. Teaches the Agent Action Record:
+// a manager-led review of agent work, judgment over outputs.
 
-export const GUIDE = `Writing docs for a human-agent team
+export const GUIDE = `Running an Agent Action Record
 
-closedtab is for human-agent teams: a person and one or more AI agents doing
-work across a sprint, or a stack of sprints. The docs it writes are the
-breadcrumb trail. When you (or a future agent, or a past one) come back, the
-trail tells you what was asked, what got done, what was decided and by whom,
-what's deliberately left, and where to pick up.
+An AI agent finishes a task. closedtab helps you review what it did and keep a
+record: a short, comparable artifact built around one idea. Outputs are easy to
+measure, and judgment is hard. The review surfaces the decisions the agent made on
+its own, the moments a human should have been in the loop, the places it was
+confidently wrong, and what that cost or risked.
 
-Write one for every useful segment of work: a bug fix, a feature, a tuning pass,
-a decision, a handoff at the end of a session. Many people do it every PR. The
-agent did the work; the doc is how the team keeps a shared memory of it.
+It works best when you stay hands-on: you as the product owner, agents as
+engineer or PM. Run it feature by feature, on the work you are steering. Across
+many runs, the patterns in the Deviation and Change sections tell you more than
+any single review.
 
-The load-bearing parts:
+The six parts:
 
-  1. What was asked for
-     The owner's request, in their words. Quote it. This is the contract the
-     work is checked against.
+  1. Intent — what was supposed to happen
+     The instruction (actual wording), how success was defined, the authority the
+     agent had to act on its own, and what fell out of scope.
 
-  2. What changed
-     What the agent actually did. Name files, commits, PRs with exact paths, so
-     the next agent can trace it (and so closedtab can reconcile it later).
+  2. Action — what actually happened
+     What the agent did (from logs where you have them), what it produced or
+     changed, where it diverged, and whether it stayed within its authority.
 
-  3. Decisions and follow-ups
-     The part that ages best. The deliberate choices, who made them (owner,
-     agent, or joint), and any call the agent inferred that the owner should
-     sanity-check. Plus the known gaps and deferred follow-ups. This is exactly
-     how a good CLAUDE.md reads: settled calls, labeled so nobody reverts them.
+  3. Judgment — human in the loop
+     The decisions the agent made alone, which of those a human should have made
+     or seen, where a human stepped in, where it should have escalated, and who
+     is accountable. This is the part that matters most.
 
-  4. Verified
-     How you know it works, stated so it's checkable against the repo.
+  4. Deviation — the gaps
+     The gaps between intent and action, and the root cause. The good deviations
+     (correct departures from a flawed instruction). The confidently-wrong.
 
-  5. For the next agent
-     The breadcrumbs: open hooks left in the code, gotchas burned in during the
-     build, what NOT to touch, and any question that needs an owner decision
-     before the work continues.
+  5. Consequence — what it cost or risked
+     The actual outcome, the harm or cost or risk, who was affected downstream,
+     and the expected failure if this run happened 100 times.
 
-It's not only AARs. closedtab new also writes decision records (ADR), sprint
-handoffs (state, what's open, what not to touch, owner questions), and forward
-proposals. Pick the shape that fits the work.
-
-Three habits that make these worth re-reading:
-
-  - Be concrete. Exact paths, commits, line ranges. Vague notes rot.
-  - Record who decided. Owner vs. agent vs. joint is the human-agent signal.
-  - Leave breadcrumbs. The next agent inherits your open hooks and your gotchas.
+  6. Change — what happens next
+     What changes before the next run, what to keep doing, what belongs with a
+     human rather than an agent, and the signal that the change worked.
 
 Get started:
 
-  closedtab new          Walks you through one, question by question, and writes
-                         a dated, prefixed file (aar-*, adr-*, handoff-*, ...).
-  closedtab check FILE   Scores a doc on whether it left the right breadcrumbs.
+  closedtab new          Scaffold a blank Agent Action Record to fill in.
+  closedtab check FILE   Score a record on whether it surfaced the right things.
+  closedtab reconcile    Line a record up against a trace of what the agent did.
 
-Later, once you have these docs and a record of what actually happened,
-closedtab reconcile checks the claims against the run: done vs. requested vs.
-left. Writing them is the whole point; the checking is the payoff.
+The record-template.md is a plain form too: work through the six sections by
+hand, no AI required, and keep the record.
 `;

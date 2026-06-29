@@ -1,79 +1,181 @@
-// Document templates for human-agent teams. closedtab writes the breadcrumbs a
-// human-agent team leaves across a sprint: what the owner asked, what the agent
-// did, what was decided (and by whom), what's deliberately left, and what the
-// next agent needs to pick the work up. Each template is an ordered list of
-// sections; each section's guidance teaches the practice and is written into the
-// file as an HTML comment when left blank, so even a skipped section instructs.
+// Doc templates for reviewing AI agent work. The flagship is the Agent Action
+// Record: a manager-led, six-part review (Intent, Action, Judgment, Deviation,
+// Consequence, Change) that surfaces the decisions an agent made on its own, the
+// moments a human should have been in the loop, where it was confidently wrong,
+// and what that cost. The record format is the canonical artifact from the
+// Agent After-Action Review skill (github.com/quarterback/AAR), here under MIT.
 //
-// The section sets and the doc types (AAR, ADR, handoff, proposal) are drawn
-// from the real corpus these were modeled on (~300 docs across several repos:
-// aar-*, adr-/ard-*, HANDOFF-*, ASSIGNMENT-*, prd-*), where the load-bearing
-// parts are the ask, what changed, the decisions (owner vs. agent), the
-// negative space, and the breadcrumbs left for whoever picks the work up next.
+// The other templates are lighter task-doc variants for a human-agent team; the
+// Agent Action Record is the default and the point. "Outputs are easy to
+// measure; judgment is not."
+
+// A labeled field inside a section (the record renders as a form of these).
+export type Field = {
+  id: string;
+  label: string;
+  hint?: string; // shown as an HTML comment when the field is blank
+};
 
 export type SectionSpec = {
   id: string;
   heading: string;
-  guidance: string;
+  guidance: string; // prompt for prose sections; summary for fielded sections
+  fields?: Field[]; // when present, the section renders as a labeled form
 };
+
+// A header field, auto-filled from date/title or left blank for the reviewer.
+export type MetaField = { label: string; auto?: "date" | "title" };
 
 export type Template = {
   id: string;
   label: string;
   description: string;
-  docLabel: string; // title prefix, e.g. "AAR", "ADR", "Handoff"
+  docLabel: string; // title prefix, e.g. "Agent Action Record", "AAR", "ADR"
   filePrefix: string; // filename prefix, e.g. "aar", "adr", "handoff"
   sections: SectionSpec[];
+  metaFields?: MetaField[]; // when present, the header is a labeled block (the record)
 };
 
-// ---- Reused sections (shared guidance across templates) ----
+// ---- The Agent Action Record (flagship, default) ----
 
-const ASK: SectionSpec = {
-  id: "asked",
-  heading: "What was asked for",
-  guidance:
-    "The owner's request, in their words. Quote it if you can. What did they actually want from this segment of work?",
+const RECORD: Template = {
+  id: "record",
+  label: "Agent Action Record",
+  description:
+    "Manager-led review of an agent run: Intent, Action, Judgment, Deviation, Consequence, Change.",
+  docLabel: "Agent Action Record",
+  filePrefix: "aar",
+  metaFields: [
+    { label: "Review date", auto: "date" },
+    { label: "Reviewed by" },
+    { label: "Agent / system" },
+    { label: "Task or period under review", auto: "title" },
+    { label: "Accountable human (name or role)" },
+  ],
+  sections: [
+    {
+      id: "intent",
+      heading: "1. Intent — what was supposed to happen",
+      guidance: "What the agent was meant to do, and the authority it was given.",
+      fields: [
+        { id: "instruction", label: "Instruction given (actual wording)" },
+        {
+          id: "success",
+          label: "Success defined in advance as",
+          hint: 'or: "not defined in advance"',
+        },
+        {
+          id: "authority",
+          label: "Authority granted to the agent",
+          hint: "what it was allowed to decide/act on without a human",
+        },
+        { id: "out_of_scope", label: "Out of scope" },
+      ],
+    },
+    {
+      id: "action",
+      heading: "2. Action — what actually happened",
+      guidance: "What the agent did, from logs where available.",
+      fields: [
+        {
+          id: "did",
+          label: "What the agent did (step by step, from logs where available)",
+        },
+        {
+          id: "produced",
+          label: "What it produced or changed",
+          hint: "files, messages, records, actions in the world",
+        },
+        { id: "differed", label: "Where actual behavior differed from the instruction" },
+        {
+          id: "within_authority",
+          label: "Stayed within granted authority? (yes / no / unknown)",
+          hint: "if no/unknown, explain",
+        },
+      ],
+    },
+    {
+      id: "judgment",
+      heading: "3. Judgment — human in the loop",
+      guidance: "Where the agent decided alone, and where a human was or should have been involved.",
+      fields: [
+        { id: "decided_alone", label: "Decisions the agent made on its own" },
+        { id: "should_have_seen", label: "Of those, which should a human have made or seen" },
+        {
+          id: "intervened",
+          label: "Where a human actually intervened (approve / edit / override / redirect)",
+        },
+        { id: "should_have_escalated", label: "Points where it should have escalated and didn't" },
+        { id: "accountable", label: "Accountable for these actions" },
+      ],
+    },
+    {
+      id: "deviation",
+      heading: "4. Deviation — the gaps",
+      guidance: "Where action and intent came apart, and why.",
+      fields: [
+        {
+          id: "gaps",
+          label: "Gaps between intent and action, and why",
+          hint: "root cause, not first answer",
+        },
+        {
+          id: "good_deviations",
+          label: "Good deviations (correct departures from a flawed instruction)",
+        },
+        {
+          id: "confidently_wrong",
+          label: "Confidently wrong",
+          hint: "high confidence + wrong — flag specifically",
+        },
+      ],
+    },
+    {
+      id: "consequence",
+      heading: "5. Consequence — what it cost or risked",
+      guidance: "The outcome, the cost, and what a bad run would look like.",
+      fields: [
+        { id: "outcome", label: "Actual outcome (did the work hold up)" },
+        { id: "harm", label: "Harm / cost / risk — realized or narrowly avoided" },
+        { id: "downstream", label: "Downstream affected parties" },
+        { id: "if_100x", label: "Expected failure if this run happened 100 times" },
+      ],
+    },
+    {
+      id: "change",
+      heading: "6. Change — what happens next",
+      guidance: "What changes before the next run.",
+      fields: [
+        {
+          id: "changes",
+          label: "Specific changes before next run",
+          hint: "instruction / scope / authority / escalation / checkpoints",
+        },
+        { id: "keep_doing", label: "Keep doing" },
+        { id: "no_delegate", label: "Should not be delegated to an agent at all" },
+        { id: "signal", label: "Signal that the change worked" },
+      ],
+    },
+  ],
 };
 
-const CHANGED: SectionSpec = {
-  id: "changed",
-  heading: "What changed",
-  guidance:
-    "What the agent actually did. Name files, commits, and PRs with exact paths so the next agent can trace it.",
-};
+// ---- Lighter task-doc variants (prose sections) ----
 
 const DECISIONS: SectionSpec = {
   id: "decisions",
   heading: "Decisions and follow-ups",
   guidance:
-    "The part that ages best: deliberate choices, who made them (owner, agent, or joint), and any calls the agent inferred that the owner should sanity-check. Plus known gaps and deferred follow-ups.",
+    "The part that ages best: deliberate choices, who made them (owner, agent, or joint), any call the agent inferred that the owner should sanity-check, plus known gaps and deferred follow-ups.",
 };
 
 const VERIFIED: SectionSpec = {
   id: "validation",
   heading: "Verified",
   guidance:
-    "How you know it works: tests run, what was checked by hand. State it so it's checkable against the repo later. \"Didn't verify X\" is a valid, useful answer.",
+    "How you know it works: tests run, what was checked by hand, stated so it's checkable against the repo later.",
 };
 
-const NEXT_AGENT: SectionSpec = {
-  id: "next_agent",
-  heading: "For the next agent",
-  guidance:
-    "Breadcrumbs for whoever picks this up: open hooks left in the code, gotchas burned in during the build, what NOT to touch (and why), and any question that needs an owner decision before continuing.",
-};
-
-// ---- Templates ----
-
-export const TEMPLATES: Template[] = [
-  {
-    id: "generic",
-    label: "Generic / minimal",
-    description: "The core sections for any segment of work.",
-    docLabel: "AAR",
-    filePrefix: "aar",
-    sections: [ASK, CHANGED, DECISIONS, VERIFIED, NEXT_AGENT],
-  },
+const TASK_TEMPLATES: Template[] = [
   {
     id: "bugfix",
     label: "Bug fix",
@@ -84,20 +186,14 @@ export const TEMPLATES: Template[] = [
       {
         id: "reported",
         heading: "What was reported",
-        guidance:
-          "The symptom as observed, ideally in the reporter's words. What looked wrong?",
+        guidance: "The symptom as observed, ideally in the reporter's words.",
       },
       {
         id: "root_cause",
         heading: "Root cause",
-        guidance:
-          "What was actually wrong underneath, not the symptom but the cause. Name the file/function.",
+        guidance: "What was actually wrong underneath, not the symptom but the cause.",
       },
-      {
-        id: "fix",
-        heading: "The fix",
-        guidance: "What you changed to address the root cause. Exact paths.",
-      },
+      { id: "fix", heading: "The fix", guidance: "What you changed. Exact paths." },
       DECISIONS,
       VERIFIED,
     ],
@@ -109,161 +205,60 @@ export const TEMPLATES: Template[] = [
     docLabel: "AAR",
     filePrefix: "aar",
     sections: [
-      ASK,
+      {
+        id: "asked",
+        heading: "What was asked for",
+        guidance: "The owner's request, in their words.",
+      },
       {
         id: "built",
         heading: "What was built",
-        guidance:
-          "What shipped. List files touched or added with exact paths.",
+        guidance: "What shipped. Files touched or added, with exact paths.",
       },
       {
         id: "design",
         heading: "Design decisions",
-        guidance:
-          "Choices worth recording and why: what you considered and rejected, which gaps you left on purpose, and which calls the owner should sanity-check.",
+        guidance: "What you considered and rejected, which gaps you left on purpose.",
       },
       VERIFIED,
-      NEXT_AGENT,
-    ],
-  },
-  {
-    id: "investigation",
-    label: "Investigation",
-    description: "A look into something: findings, verdicts, follow-ups.",
-    docLabel: "AAR",
-    filePrefix: "aar",
-    sections: [
-      {
-        id: "question",
-        heading: "The question",
-        guidance: "What prompted this: the question you set out to answer.",
-      },
-      {
-        id: "found",
-        heading: "What I found",
-        guidance: "The findings. Be concrete; cite files/lines.",
-      },
-      {
-        id: "verdict",
-        heading: "Bug vs. working-as-intended",
-        guidance:
-          "For each finding: is it actually a bug, or behaving as designed? Distinguishing these is the whole point of an investigation.",
-      },
-      {
-        id: "recommendations",
-        heading: "Recommended follow-ups",
-        guidance: "What should happen next, beyond what you did here, and what needs an owner decision.",
-      },
     ],
   },
   {
     id: "adr",
     label: "Decision record (ADR)",
-    description: "A design/architecture decision: context, decision, alternatives, consequences.",
+    description: "A design decision: context, decision, alternatives, consequences.",
     docLabel: "ADR",
     filePrefix: "adr",
     sections: [
-      {
-        id: "context",
-        heading: "Context",
-        guidance:
-          "The forces at play: what prompted this decision, the constraints, what the owner asked for.",
-      },
-      {
-        id: "decision",
-        heading: "Decision",
-        guidance: "What we're doing. State it plainly, in the present tense.",
-      },
-      {
-        id: "alternatives",
-        heading: "Alternatives considered",
-        guidance:
-          "What else was on the table and why it was rejected. This is what stops the decision being relitigated later.",
-      },
-      {
-        id: "consequences",
-        heading: "Consequences",
-        guidance:
-          "What this enables, what it costs, the trade-offs accepted, and the residual risks carried forward.",
-      },
-      {
-        id: "decided_by",
-        heading: "Decided by",
-        guidance:
-          "Who made the call: owner, agent, or joint. If the agent inferred it, flag it for the owner to confirm.",
-      },
+      { id: "context", heading: "Context", guidance: "What prompted this decision and the constraints." },
+      { id: "decision", heading: "Decision", guidance: "What we're doing, in the present tense." },
+      { id: "alternatives", heading: "Alternatives considered", guidance: "What else was on the table and why it was set aside." },
+      { id: "consequences", heading: "Consequences", guidance: "What this enables, what it costs, the residual risks." },
+      { id: "decided_by", heading: "Decided by", guidance: "Owner, agent, or joint." },
     ],
   },
   {
     id: "handoff",
     label: "Sprint handoff",
-    description: "State transfer to the next agent: what works, what's open, what not to touch.",
+    description: "State transfer to the next agent.",
     docLabel: "Handoff",
     filePrefix: "handoff",
     sections: [
-      {
-        id: "state",
-        heading: "Current state",
-        guidance:
-          "What works end-to-end, and what's confirmed broken (with evidence: file/line, error, repro).",
-      },
-      {
-        id: "pick_up",
-        heading: "Where to pick up",
-        guidance:
-          "The next concrete steps, in priority order. Where to start reading.",
-      },
-      {
-        id: "do_not_touch",
-        heading: "What not to touch",
-        guidance:
-          "Settled decisions and invariants. Each with a one-line reason so the next agent doesn't relitigate or revert them.",
-      },
-      {
-        id: "open_questions",
-        heading: "Open questions for the owner",
-        guidance:
-          "Decisions that need the owner, not more code. The things you can't resolve alone.",
-      },
-      {
-        id: "watch",
-        heading: "What to watch",
-        guidance: "Residual risks, fragile spots, gotchas burned in during the build.",
-      },
-    ],
-  },
-  {
-    id: "proposal",
-    label: "Proposal / feature request",
-    description: "Forward-looking: what we want, why, scope, open questions.",
-    docLabel: "Proposal",
-    filePrefix: "proposal",
-    sections: [
-      {
-        id: "what",
-        heading: "What we want",
-        guidance: "The ask in one or two sentences. The change you're proposing.",
-      },
-      {
-        id: "why",
-        heading: "Why",
-        guidance: "The motivation. What problem it solves, who it's for.",
-      },
-      {
-        id: "scope",
-        heading: "Scope: what it is and isn't",
-        guidance:
-          "Draw the boundary explicitly. Saying what's out of scope is as useful as saying what's in.",
-      },
-      {
-        id: "open_questions",
-        heading: "Open questions",
-        guidance: "What needs an owner decision before work starts.",
-      },
+      { id: "state", heading: "Current state", guidance: "What works end-to-end, and what's confirmed broken (with evidence)." },
+      { id: "pick_up", heading: "Where to pick up", guidance: "The next concrete steps, in priority order." },
+      { id: "do_not_touch", heading: "What not to touch", guidance: "Settled decisions, each with a one-line reason." },
+      { id: "open_questions", heading: "Open questions for the owner", guidance: "Decisions that need the owner, not more code." },
     ],
   },
 ];
 
+export const TEMPLATES: Template[] = [RECORD, ...TASK_TEMPLATES];
+
 export function getTemplate(id: string): Template | undefined {
   return TEMPLATES.find((t) => t.id === id);
+}
+
+/** True when a template renders as a labeled form (the Agent Action Record). */
+export function isFielded(template: Template): boolean {
+  return template.sections.some((s) => s.fields && s.fields.length > 0);
 }
